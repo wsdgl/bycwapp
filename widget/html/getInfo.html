@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width">
+		<title>历史查询</title>
+		<link rel="stylesheet" type="text/css" href="../css/getInfo.css">
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/buttons.css">
+		<link rel="stylesheet" type="text/css" href="../css/jquery-ui.css">
+		<link rel="stylesheet"  href="../css/font-awesome.min.css">
+		<script type="text/JavaScript" src="../js/jquery-3.1.0.min.js"></script>
+		<script type="text/javascript" src="../script/api.js"></script>
+		<script type="text/JavaScript" src="../js/jquery-ui.js"></script>
+		<script type="text/JavaScript" src="../js/config.js"></script>
+		<style>
+		</style>
+		<script type="text/javascript">
+			var user = null
+			apiready = function() {
+				user = $api.getStorage(config.USER_KEY)
+				var now = new Date()
+				var year = now.getFullYear();
+				var month = now.getMonth()+1
+				var day = now.getDate()
+				month = month<10?'0'+month:month
+				day = day<10?'0'+day:day
+				var today = year+'-'+month+'-'+day
+				 $("#start-date").val(today);
+				 $("#end-date").val(today);
+			}
+			function history() {
+				var startdate = $("#start-date").val();
+				var enddate = $("#end-date").val();
+				var s = new Date(startdate).getTime()
+				var e = new Date(enddate).getTime()
+				if(s > e ){
+					var tmp = startdate
+					startdate = enddate
+					enddate = tmp
+				}
+				data = {
+					startdate : startdate,
+					enddate : enddate,
+					workid : user._id
+				}
+				console.log("data"+JSON.stringify(data));
+				post(url.history, data, function(ret, err) {
+					if (ret.retStatus == 'OK') {
+						var barhistory = ret.retValue;
+						console.log("barhistory"+JSON.stringify(barhistory));
+						var sum = 0;
+						var total = 0;
+						var html = ''
+						console.log("length"+barhistory.length)
+						for (var i = 0; i < barhistory.length; i++) {
+
+							var price = barhistory[i].price
+							sum += price;
+							total++
+							html += '<tr><td>' + barhistory[i].barId + '</td><td>' + barhistory[i].price + '</td></tr>'
+						}
+						html += '<tr><td>总计:' + total + '条</td><td>' + sum + '元</td></tr>'
+						$("#tbody-scanner").html(html);
+					} else {
+						alert("查询失败");
+					}
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<div class="scanner-history">
+			<div class="header">
+				<div class="header-left" onclick="api.closeFrame();">
+					<i class="fa fa-mail-reply fa-2x" ></i>
+				</div>
+				<div class="header-center">
+					<h1>查询历史条码信息</h1>
+				</div>
+				<div class="header-left">
+					<i class="fa fa-sign-out fa-2x"></i>
+				</div>
+			</div>
+			<div class="history-show">
+				<div class="scandate">
+					<input id="start-date" value="" class="choose-date" type="date" placeholder="开始时间"/>
+					至
+					<input id="end-date" class="choose-date" type="date" placeholder="结束时间"/>
+					<button class="check" style="width: 50px;height: 30px;background: #7CCD7C;outline: none;float: right;margin:10px 20px 10px 0;" onclick="history()">
+						查询
+					</button>
+				</div>
+				<div class="sacnner-show">
+					<table class="table-scanner">
+						<thead>
+							<tr>
+								<td>条码信息</td>
+								<td>价格</td>
+							</tr>
+						</thead>
+						<tbody id="tbody-scanner"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

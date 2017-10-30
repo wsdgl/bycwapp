@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+   <!--  <meta name="keyword" content="绑定界面"> -->
+    <meta name="viewport" content="width=device-width">
+    <title>宝业</title>
+    <link rel="stylesheet" type="text/css" href="../css/jquery-ui.css">
+    <link rel="stylesheet"  href="../css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/buttons.css">
+    <link rel="stylesheet" type="text/css" href="../css/bd.css">
+    <script type="text/JavaScript" src="../js/jquery-3.1.0.min.js"></script>
+    <script type="text/JavaScript" src="../js/jquery-ui.js"></script>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/JavaScript" src="../js/config.js"></script>
+    <script type="text/JavaScript" src="../js/common.js"></script>
+
+    <style>
+    	.button{
+    		margin-top:2px;
+    	}
+
+
+  .ui-tooltip, .arrow:after {
+    background: #F49F01;
+    border: 2px solid white;
+  }
+  .ui-tooltip {
+    padding: 10px 20px;
+    color: white;
+    border-radius: 20px;
+    font: bold 14px "Helvetica Neue", Sans-Serif;
+    text-transform: uppercase;
+    box-shadow: 0 0 7px black;
+  }
+  .arrow {
+    width: 70px;
+    height: 16px;
+    overflow: hidden;
+    position: absolute;
+    left: 50%;
+    margin-left: -35px;
+    bottom: -16px;
+  }
+  .arrow.top {
+    top: -16px;
+    bottom: auto;
+  }
+  .arrow.left {
+    left: 20%;
+  }
+  .arrow:after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: -20px;
+    width: 25px;
+    height: 25px;
+    box-shadow: 6px 5px 9px -9px black;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    tranform: rotate(45deg);
+  }
+  .arrow.top:after {
+    bottom: -10px;
+    top: auto;
+  }
+
+    </style>
+	<script type="text/javascript">
+  	var user = null
+  	var lead = null
+  	var group = null
+  	var db = null
+  	var barCodes = []
+  	var barUploadQuee = []
+  	var barUploadErrorQuee = []
+
+  	var data1 =[];
+    var employeeNumbers=[];
+    var scannerNum;
+    var groupNumber = [];
+    var barscandate;
+    var date;
+    var addScandate;
+    var createdate;
+    var clearBar;
+    var downscan_id;
+    var downscan_date;
+    var downscan_satus;
+    var employeeInfo;
+    var key = "groupStatus";
+    var groupid = "groupid";
+    var flag;
+    var localBarInfo = "localBarInfo";
+    var updateBarInfo = "updateBarInfo";
+
+    function updateGroup(cb){
+      console.log("user._id"+user._id);//user._id传过去就变成workid？
+    	get(url.downloadgroup + '/' + user._id, function(ret, err){
+    		if(err){
+    			alert("查询组信息失败!错误:" + err.msg)
+    		}else if(ret.retStatus == 'OK'){
+    			group = ret.retValue
+    			$api.setStorage(config.GROUP_KEY,group)
+    			var groupi = $api.getStorage(config.GROUP_KEY);
+    			if(cb){
+    				cb();
+    			}
+    		}else{
+    			alert("你还没有加入或者创建小组!")
+    			if(cb){
+    				cb();
+    			}
+    		}
+    	})
+    }
+
+    function renderGroup(){
+    	var html = ''
+    	var members = []
+    	var dom = $('#employeecontent')
+    	var station = $('#employeeStation')
+		if(group){
+			members.push(group.leader)
+			members = members.concat(group.members)
+			if(isLeader()){
+				$("#deleteBtn").show();
+				$("#createBtn").hide();
+			}else{
+				$("#deleteBtn").hide();
+				$("#createBtn").hide();
+			}
+		}else{
+			$("#deleteBtn").hide();
+			$("#createBtn").show();
+			members.push(user)
+		}
+    	for(i in members){
+    		guser = members[i]
+			var name = typeof guser.name =='object'?guser.name.first +guser.name.last:guser.name
+			var phone = guser.workPhones == null?null: guser.workPhones.mobile
+			html += '<tr><td>' + guser.workId + '</td><td>' + name + '</td><td>' + phone + '</td></tr>'
+    	}
+    	dom.html(html)
+    	station.html(user.station)
+    }
+    function isLeader(){
+    	if(group==null){
+    		group = $api.getStorage(config.GROUP_KEY)
+    	}
+    	if(group == null){
+    		return false
+    	}else{
+    		if(group.leader._id == user._id){
+    			return true
+    		}else{
+    			return false
+    		}
+    	}
+
+    }
+
+    function updateBarinfo(selectProj){//下载条码时如果不同岗位用一个手机登录不应该再显示手机原有的数据，sql语句“INSERT OR REPLACE INTO”应该只在当前岗位，
+    //换了岗位更新时应该覆盖原有数据
+    	var durl = url.download + '/' +group._id
+      var data = {data: selectProj};
+    	post(durl, data, function(ret, err){
+    		if(err){
+    			alert("请求数据失败!错误:" + err.msg)
+    		}else{
+    			if(ret.retStatus == 'OK'){
+     				barCodes = ret.retValue
+                    //barCodes = ret.retValue
+    				updateBarinfoSqlite(0, function(){
+    					renderBarinfos();
+    				})
+
+    			}
+    		}
+    	})
+    }
+    function updateBarinfoSqlite(num, cb){
+    	if(num >= barCodes.length){
+    		if(cb)
+    			cb()
+    	}else{
+    		var barinfo = barCodes[num]
+    		_id = barinfo._id
+  			barId = barinfo.barId
+      	barScanDate = barinfo.scanTime ? barinfo.scanTime:null
+  			status = barinfo.scanStatus ? barinfo.scanStatus :0
+  			projName = barinfo.projName
+  			groupId = barinfo.groupId ? barinfo.groupId :null
+      	var sql = 'INSERT OR REPLACE INTO Barcodetest (_id,barId,barScanDate,projName,status,groupId) VALUES (\'' + _id + '\',\'' + barId + '\',' + barScanDate + ',\'' + projName + '\','
+    		+ status +',\'' + groupId + '\')'
+    		executeSql(db, sql, function(){
+    			updateBarinfoSqlite(num+1,cb)
+    		}, function(errMsg){
+    			alert("更新本地数据失败！错误:" + errMsg)
+    			console.log("更新本地数据失败！错误:" + errMsg)
+    		})
+    	}
+    }
+    function uploadBarCode(num, cb){
+    	if(num >= barUploadQuee.length){
+    		if(cb)
+    			cb()
+    	}else{
+    		var bar = barUploadQuee[num]
+    		bar.groupId = group._id
+    		console.log("手动上传"+JSON.stringify(bar));
+    		post(url.uploadbarcode, bar, function(ret,err){
+    			if(err){
+    				toast('上传条码信息失败!错误:'+err.msg)
+    				barUploadErrorQuee.push(bar)
+    				uploadBarCode(num+1, cb)
+    			}else{
+    				if(ret.retStatus=='OK'){
+    					var sql = 'update Barcodetest set status = 2 where _id = \''+bar._id+'\''
+    					executeSql(db, sql, function(){
+    						//toast('条码本地更新成功!')
+    						uploadBarCode(num+1, cb)
+    					},function(errMsg){
+    						toast('条码本地更新状态失败!错误：'+errMsg)
+    					})
+    				}else{
+    					barUploadErrorQuee.push(bar)
+    					uploadBarCode(num+1, cb)
+    				}
+    			}
+    		})
+    	}
+    }
+    function uploadData(){
+    	uploadBarinfo(function(){
+    		renderBarinfos()
+    	})
+    }
+
+    function renderBarinfos(){
+    	var sql = 'SELECT * FROM Barcodetest'
+    	selectSql(db, sql, function(barinfos){
+    		var suHtml = []
+    		var snuHtml = []
+    		var nsuHtml = []
+    		var dom=$("#scannercontent")
+    		for(i in barinfos){
+    			var barinfo = barinfos[i]
+    			var htl = '<td>' + barinfo.barId + '</td><td class = "tooltip" title="barInfo" data-placement="left"><a href=javascript:barInfo(\'' + barinfo.barId + '\')>详情</a></td></tr>'
+    			if(barinfo.status ==2 ){
+    				suHtml.push(htl);
+    			}else if(barinfo.status ==1){
+    				snuHtml.push(htl)
+    			}else{
+    				nsuHtml.push( htl)
+    			}
+
+    		}
+    		var showAll = $('#isShowAll').is(':checked')
+    		var html = ''
+    		var num=1
+    		for(var i in suHtml){
+    			html += '<tr style="color:green"><td>'+num+'</td>'+suHtml[i]
+    			num++
+    		}
+    		for(var i in snuHtml){
+    			html += '<tr style="color:orange"><td>'+num+'</td>'+snuHtml[i]
+    			num++
+    		}
+    		if(showAll){
+	    		for(var i in nsuHtml){
+	    			html += '<tr style="color:red"><td>'+num+'</td>'+nsuHtml[i]
+	    			num++
+	    		}
+    		}
+    		dom.html(html)
+    	}, function(errMsg){
+    		alert("查询本地条码信息失败! 错误:" + errMsg)
+    	})
+    }
+    function updateData(selectProj){
+    	updateGroup(function(){
+    		renderGroup()
+    		updateBarinfo(selectProj, function(){
+    			renderBarinfos()
+    		})
+    	})
+
+    }
+    function uploadBarinfo(cb){
+      var remark = $("#remark").val()
+      var sql1 = 'update Barcodetest set remark ='+remark+' where status = 1';
+      var sql2 = 'select * from Barcodetest where status = 1';
+      executeSql(db, sql1, function(){
+          selectSql(db, sql2, function(data){
+      			barUploadQuee = data
+      			barUploadErrorQuee = []
+      			uploadBarCode(0, function(){
+      				if(barUploadErrorQuee.length > 0){
+      					toast(barUploadErrorQuee.length+'项条码上传失败!')
+
+      				}else{
+      					toast('所有已扫描条码均已上传!')
+      				}
+      				if(cb)
+      					cb()
+      			})
+          });
+      }, function(){
+        toast('备注插入失败');
+        cb();
+      })
+
+
+    }
+//	function uploadBarCode(){
+//		//selectcontent();
+//		var root = $api.getStorage('groupInfo');
+//		console.log("grinfo"+JSON.stringify(root));
+//		if(root == "true"){
+//			var barCodeInfo = $api.getStorage('updateBarInfo');
+// 			var sannedInfo = {
+// 				barinfoarray:JSON.stringify(barCodeInfo)
+// 			}
+//			console.log("sannedInfo"+JSON.stringify(barCodeInfo));
+//			post(url.uploadbarcode,sannedInfo,function(ret,err){
+//		  		console.log("sannedInfoaaaaaaaa"+JSON.stringify(sannedInfo));
+//				if(ret.retStatus == 'OK'){
+//					alert("条码上传成功");
+//					console.log("条码上传成功："+JSON.stringify(ret));
+//				}else{
+//					if(ret.retStatus=='Fail'){
+//					alert("没有新扫的条码可以上传");
+//					}else{
+//					console.log("条码上传失败"+JSON.stringify(err));
+// 	     			alert("条码上传失败");
+//					}
+//				}
+//			});
+//		}else{
+//			alert("对不起，你没有权限");
+//		}
+//	}
+//
+
+	function barInfo(barid){
+		//var barid = $(event.target).parent().find('.scanname').text();
+		get(url.barinfo+'/'+barid,function(ret,err){
+			if(ret.retStatus == 'OK'){
+				var barinfos = ret.retValue.projName
+				var projectName = barinfos.projectName.name
+				var aluminumNo =barinfos.lbbh
+				var alumminumName = barinfos.lbmc
+				var singleArea = barinfos.dkjjmj
+				var isAbnormity =barinfos.sfyx
+				var colorNo = barinfos.jgsh
+				var figureNo = barinfos.jgth
+				var width = barinfos.W
+        var cgdh = barinfos.cgdh
+				var length1 = barinfos.L1
+				var length2 = barinfos.L2
+				var length3 = barinfos.L3
+				var length4 = barinfos.L4
+				var length5 = barinfos.L5
+				var length6 = barinfos.L6
+				console.log("aluminumNo"+ aluminumNo+projectName );
+				console.log("alumminumName"+alumminumName +singleArea+ isAbnormity+colorNo+figureNo+width+length1+length2+length3+length4+length5+length6);
+				//$(function(){
+					$('.tooltip').tooltip({
+						content:function(){
+							if($(this).is('[title]')){
+							return "<div><dl><dt class='dl-style'>产品名称：</dt><dd id='projName' class='dl-style'>"+projectName+"</dd></dl>"
+                +"<dl><dt class='dl-style'>采购单号：</dt><dd class='dl-style'>"+cgdh+"</dd></dl>"
+								+"<dl><dt class='dl-style'>铝板号：</dt><dd class='dl-style'>"+aluminumNo+"</dd></dl>"
+								+"<dl><dt class='dl-style'>铝板名称：</dt><dd class='dl-style'>"+alumminumName+"</dd></dl>"
+								+"<dl><dt class='dl-style'>单个面积：</dt><dd class='dl-style'>"+singleArea+"</dd></dl>"
+ 								+"<dl><dt class='dl-style'>是否异形：</dt><dd class='dl-style'>"+isAbnormity+"</dd></dl>"
+ 								+"<dl><dt class='dl-style'>色号：</dt><dd class='dl-style'>"+colorNo+"</dd></dl>"
+ 								+"<dl><dt class='dl-style'>图号：</dt><dd class='dl-style'>"+figureNo+"</dd></dl>"
+ 								+"<dl><dt class='dl-style'>宽：</dt><dd class='dl-style'>"+width+"</dd></dl>"
+ 								+"<dl><dt class='dl-style'>L1：</dt><dd class='dl-style'>"+length1+"</dd>"
+ 								+"&nbsp<dt class='dl-style'>L2：</dt><dd class='dl-style'>"+length2+"</dd></dl>"
+ 								+"<dl><dt class='dl-style'>L3：</dt><dd class='dl-style'>"+length3+"</dd>"
+ 								+"&nbsp<dt class='dl-style'>L4：</dt><dd class='dl-style'>"+length4+"</dd></dl>"
+ 								+"<dl><dt class='dl-style'>L5：</dt><dd class='dl-style'>"+length5+"</dd>"
+ 								+"&nbsp<dt class='dl-style'>L6：</dt><dd class='dl-style'>"+length6+"</dd></dl>"
+							+"</div>"
+							}
+					   }
+				  });
+			   //});
+			  // $(function(){
+//			   		$('.tooltip').tooltip({
+//			   			position: {
+//      				my: "center bottom-20",
+//      				at: "center top",
+//      				using: function( position, feedback ) {
+//        					$( this ).css( position );
+//        						$( "<div>" )
+//          						.addClass( "arrow" )
+//          						.addClass( feedback.vertical )
+//          						.addClass( feedback.horizontal )
+//          						.appendTo( this );
+//      			   	}
+//    				 	}
+//			   		});
+			 //  });
+			}
+		});
+	}
+
+	function deletetr(){
+		clearBar = $(event.target).parent().parent().find('.scanname').text();
+		console.log(clearBar);
+		var root = $api.getStorage('groupInfo');
+		console.log("grinfo"+JSON.stringify(root));
+		if(root == "true"){
+      	var del=confirm("是否清除"+clearBar+"条码？")
+     		if(del==true){
+     		    console.log("clearBar:"+clearBar);
+     			post(url.clearbar+'/'+clearBar,{},function(ret,err){
+     				if(ret.retStatus == 'OK'){
+     					console.log("clearbarOK"+JSON.stringify(ret));
+     					var scansta = JSON.stringify(ret.retValue.scanstatus);
+     					var uploadsta = JSON.stringify(ret.retValue.uploadstatus);
+     					clearBarCode(scansta,uploadsta,clearBar);
+     				}else{
+     					if(ret.retStatus == 'Fail'){
+     						deleteBarCode(clearBar);
+     					}
+     				}
+     			});
+      	  	}
+      	  }
+	}
+
+	function clearBarCode(scanstatus,uploadstatus,barid){
+		var db = api.require('db');
+		db.executeSql({
+			name:'barcodeTable',
+			sql: 'UPDATE Barcodetest SET scanstatus = '+ scanstatus +', uploadstatus = '+ uploadstatus +' WHERE barid =\''+barid+'\''
+		}, function(ret, err){
+			if (ret.status) {
+				alert("清除成功");
+				self.location.reload();
+			}else {
+				alert("清楚失败："+JSON.stringify(err));
+			}
+		});
+	}
+
+	function deleteBarCode (barid){
+		var db = api.require('db');
+		db.executeSql({
+			name:'barcodeTable',
+			sql: 'delete from Barcodetest WHERE barid = '+barid
+		}, function(ret, err){
+			if (ret.status) {
+				alert("清除成功");
+				self.location.reload();
+			}else {
+				alert("清楚失败："+JSON.stringify(err));
+			}
+		});
+	}
+ 	function addscanner(){
+ 		var root = $api.getStorage('groupInfo');
+		console.log("grinfo"+JSON.stringify(root));
+		if(root == "true"){
+          scannerNum = window.prompt("请输入条码号：");
+          if(scannerNum != null){
+          	var now = new Date().Format("yyyy-MM-dd hh:mm:ss");
+            barscandate = JSON.stringify(now.toLocaleString());
+            var scanstatus = 'scanned';
+            console.log("scannerNum:"+scannerNum);
+            updateBarCodeInfo(scanstatus,groupNumber,barscandate,scannerNum);//将插入改为更新
+          }
+		}else{
+        	alert("对不起，你没有权限");
+        }
+	}
+	function Scanner(){
+		if(true){
+			var FNScanner=api.require('FNScanner');
+			FNScanner.openScanner({
+
+        	},function(ret,err){
+
+            	if(err){
+            		alert("ERROR:"+err.msg);
+            		console.log("ERROR:"+err.msg)
+            	}else{
+            		if(ret.eventType=="success"){
+            			barId = ret.content;
+            			var ssql = 'select * from Barcodetest where barId = \''+barId+'\''
+            			selectSql(db, ssql, function(data){
+            				if(data.length==0){
+            					toast('该条码在本地不存在!')
+//          					var bardata = {
+//          						_id:new Date().getTime(),
+//          						barId:barId,
+//          						status:-1,
+//          						barScanDate:new Date(),
+//          						groupId:group._id
+//          					}
+//          					var isql = 'insert into Barcodetest(_id, barId, status, barScanDate, groupId) values (\''+_id
+//          						+'\',\''+barId+'\',\''+status+'\',\''+barScanDate+'\',\''+groupId+'\')'
+//          					executeSql(db, isql, function(){
+//          						uploadBar(bardata)
+//          					},function(errMsg){
+//          						toast('数据插入失败!错误:'+errMsg)
+//          					})
+            				}else{
+            					if(data[0].status==0){
+	            					var sql = 'update Barcodetest set status = 1,barScanDate=\''+new Date().getTime()+'\' where barId = \''+barId+'\''
+	            					executeSql(db, sql, function(){
+
+										      var bar = {
+		            						  barId:barId,
+		            						  barScanDate:new Date().getTime(),
+		            						  groupId:group._id,
+                              remark:$('#remark').val()
+	            					  }
+	            						renderBarinfos()
+	            						uploadBar(bar)
+	            					}, function(errMsg){
+	            						toast('本地数据更新失败！错误:'+errMsg)
+	            					})
+	            				}else{
+	            					toast('该条码已经扫过了！重复扫描无效!')
+	            				}
+            				}
+            			})
+          			//首先自动上传，把条码、扫码人、扫码时间、扫码状态上传，如果上传失败那么数据保存到本地（用updateBarCodeInfo）；如果上传
+          			//成功，更新数据库，将条码、扫码人、扫码时间、扫码状态和上传状态修改保存到本地
+            			//updateBarCodeInfo(scanstatus,groupNumber,barscandate,data1);//将插入改为更新
+            		}
+            	}
+            });
+        }else{
+        	alert("对不起，你没有权限");
+        }
+	}
+	function uploadBar(bar){
+		var data = {
+			barId:bar.barId,
+			groupId:bar.groupId,
+			barScanDate:bar.barScanDate,
+      remark: bar.remark
+		}
+		post(url.uploadbarcode, data, function(ret,err){
+			if(err){
+				toast('上传失败!错误:'+err.msg)
+			}else{
+				if(ret.retStatus == 'OK'){
+					var sql = ''
+					if(bar.status == -1){
+						sql = 'update Barcodetest set status = -2 where barId = \''+bar.barId+'\''
+					}else{
+						sql = 'update Barcodetest set status = 2 where barId = \''+bar.barId+'\''
+					}
+					executeSql(db, sql, function(){
+						renderBarinfos()
+					},function(errMsg){
+						toast('上传数据成功！写入本地失败!错误:'+errMsg)
+					})
+				}else{
+					toast('上传失败!')
+				}
+			}
+		})
+	}
+//	function testcontent(barid,scantime,scanstatus,uploadstatus,groupNumber){
+//			var db = api.require('db');
+//			db.executeSql({
+// 			 		name: 'barcodeTable',
+// 					sql: 'INSERT OR REPLACE INTO Barcodetest (_id,barId,barScanDate,projName,status,groupId) VALUES (' + _id + ',' + barId + ',' + barScanDate + ',' + projName + ',' + status+ ',' + groupId + ')'
+//					}, function(ret, err){
+//						if (ret.status) {
+//						   selectcontent();
+//							//console.log("testcontsucceed:"+JSON.stringify(ret));
+//						}else{
+//							//console.log("testcontfail:"+JSON.stringify(err));
+//							alert("条码存入失败！");
+//						}
+//					});
+//
+//	}
+
+	function updateBarCodeInfo(scanned,groupNumber,barscandate,barid){
+		var db = api.require('db');
+		db.executeSql({
+	        name:'barcodeTable',
+	        sql:'UPDATE Barcodetest SET scanstatus = \''+scanned+'\', groupNumber = '+ groupNumber +',scantime = '+barscandate +' WHERE barid =\''+barid+'\''
+        },function(ret,err){
+        	if(ret.status){
+//      		$api.setStorage(updateBarInfo,ret.data);
+ 	     		console.log("条码表修改成功:"+JSON.stringify(ret));
+    			selectcontent();
+//  		   console.log("updatebarinfo:"+JSON.stringify(updatebar));
+        	}else{
+        		alert(JSON.stringify(err));
+        		console.log("errbarid"+JSON.stringify(err));
+				alert("条码表更新失败！");
+        	}
+        });
+	}
+
+	function selectcontent(){
+			var db = api.require('db');
+ 				db.selectSql({
+  					name: 'barcodeTable',
+    				sql: 'SELECT * FROM Barcodetest'
+				}, function(ret, err) {
+    					if (ret.status){
+    					var bar =[];
+    					var bars=[];
+    					var html1="";
+    					var html2="";
+    					var html3="";
+    					var btr="";
+    					var dom=$("#scannercontent");
+    					$api.setStorage(updateBarInfo,ret.data);
+    					var  localbar = $api.getStorage('updateBarInfo');
+    					//console.log("updateBarInfo:"+JSON.stringify(localbar));
+    						for(var i = 0; i<ret.data.length; i++){
+    							//console.log("查询结果："+"记录"+i+JSON.stringify(ret.data[i]));
+//  							$("#scannercontent").append("<tr><td>"+Number(i+1)+"</td><td class='scanname tooltip' title='barInfo' onclick='barInfo()'>"+ret.data[i].barid+
+//  							"</td><td><a href='javascript:;' class='deletetr' onclick='deletetr()'>清除</a></td></tr>");
+    							var scansta = ret.data[i].scanstatus;
+    							var uploadsta = ret.data[i].uploadstatus;
+    							var No = Number(i+1);
+    							var barNo = ret.data[i].barid;
+    							var clear = '清除';
+    							var bar = [No,barNo,clear,scansta,uploadsta];
+    							//console.log("bar&bar&bar:"+bar);
+    							 bars.push(bar);
+    						}
+     						//console.log("bars-bars-bars:"+bars);
+						for(var i=0;i<bars.length;i++){
+// 		 					btr+="<tr><td>"+bars[i][0]+"</td>"
+// 		 					+"<td class='scanname tooltip' title='barInfo' onclick='barInfo()'>"+bars[i][1]+"</td>"
+// 		 					+"<td><a href='javascript:;' class='deletetr' onclick='deletetr()'>"+bars[i][2]+"</a></td></tr>"
+  						    //console.log("html:"+bars[i]);
+							if(bars[i][3] == 'scanned'&& bars[i][4]=='upload'){
+								html1 += "<tr><td>"+Number(i+1)+"</td>"
+ 		 								+"<td class='scanname tooltip html1-color' title='barInfo' onclick='barInfo()'>"+bars[i][1]+"</td>"
+ 		 								+"<td><a href='javascript:;' class='deletetr' onclick='deletetr()'>"+bars[i][2]+"</a></td></tr>"
+ 		 							//	console.log("html1:"+bars[i]);
+							}else{
+								if(bars[i][3] == 'scanned'&& bars[i][4]=='noUpload'){
+									html2 +="<tr><td>"+ Number(i+1)+"</td>"
+ 		 								  +"<td class='scanname tooltip html2-color' title='barInfo' onclick='barInfo()'>"+bars[i][1]+"</td>"
+			 		 					  +"<td><a href='javascript:;' class='deletetr' onclick='deletetr()'>"+bars[i][2]+"</a></td></tr>"
+ 										// console.log("html2:"+bars[i]);
+								}else{
+									if(bars[i][3] == 'noScan'&& bars[i][4]=='noUpload'){
+										html3 +="<tr><td>"+ Number(i+1)+"</td>"
+ 		 								  		+"<td class='scanname tooltip html3-color' title='barInfo' onclick='barInfo()'>"+bars[i][1]+"</td>"
+			 		 					  		+"<td><a href='javascript:;' class='deletetr' onclick='deletetr()'>"+bars[i][2]+"</a></td></tr>"
+ 											//	console.log("html3:"+bars[i]);
+									}
+								}
+							}
+ 						}
+	     				dom.html(html1+html2+html3);
+   						} else {
+        						alert("查询失败："+JSON.stringify(err));
+   						 		}
+			  });
+	}
+
+
+
+//	function groupcontent(workname,tel,workid){
+//			var employeedb = api.require('db');
+//			employeedb.executeSql({
+//				name: 'groupTable',
+//     			sql: 'INSERT OR REPLACE INTO Workgroup (workname,tel,workid) VALUES (' + workname + ',' + tel + ',' + workid + ')'
+//  		}, function(ret, err){
+//				if (ret.status) {
+//					console.log("存入小组人员："+JSON.stringify(ret));
+////      			var submitGroup='create';
+////	      			$api.setStorage('groupStatus',submitGroup);
+////	  				$("#deleteBtn").show();
+////	  				$("#createBtn").hide();
+//	  				selectemployee()
+//      		}else{
+//  				console.log("组员存入执行失败"+JSON.stringify(err));
+//  				alert("组员存入执行失败！");
+//  			}
+//  		});
+//	}
+
+//  	function selectemployee(){
+//  		var employeedb = api.require('db');
+//   		employeedb.selectSql({
+//    			name: 'groupTable',
+//      		sql: 'SELECT * FROM Workgroup'
+//  		}, function(ret, err){
+//      			if (ret.status) {
+//      				var str = "";
+//      				//var groupdata = JSON.stringify(ret.data);
+//      				//console.log("groupdata:"+JSON.stringify(ret.data));
+//      				var groupN=[];
+//      				var groups=[];
+//      				var dom = $("#employeecontent");
+//      				for(var i = 0; i<ret.data.length; i++){
+//	    					// console.log("查询结果："+JSON.stringify(ret.data[i]));
+//      				    //$("#employeecontent").append("<tr><td>"+ret.data[i].workname+"</td><td>"+ret.data[i].workid+"</td><td>"+ret.data[i].tel+"</td></tr>");
+//
+//							var name = ret.data[i].workname;
+//							var id = ret.data[i].workid;
+//							var tel = ret.data[i].tel;
+//							var groupdata = [id,name,tel];
+//							groups.push(groupdata);
+//							//console.log("groupdata"+groupdata);
+//       					if(i == ret.data.length-1){
+//      						groupN=groupN+ret.data[i].workid;
+//      					}else{
+//      						groupN=groupN+ret.data[i].workid+'&';
+//      					}
+//      			  		groupNumber=JSON.stringify(groupN);
+//      			  		//console.log('selectgroup:'+groupNumber);
+//      			  		var submitGroup='create';
+//	    				  	$api.setStorage('groupStatus',submitGroup);
+//	     				 	$("#deleteBtn").show();
+//	  						$("#createBtn").hide();
+//      				}
+//      				for(var i=0;i<groups.length;i++){
+//  						str+="<tr>"
+// 							for(var j=0;j<groups[i].length;j++){
+//     							str+="<td>"
+//     							str+=groups[i][j]+"</td>"
+// 							}
+//  						str+="</tr>"
+//						}
+//      				dom.html(str);
+//      				if(ret.data==""){
+//      					employeeInfo();
+//      				}
+//      				employeeInfo = $api.getStorage('userInfo');
+//      				 $("#employeeStation").html(employeeInfo.station);
+//
+//     				 } else {
+//          				alert("查询失败："+JSON.stringify(err));
+//
+//     						}
+// 				});
+//  	}
+
+
+// 	  function submit(){
+// 	  		var workermember = $api.getStorage('groupInfo');
+// 	  		var employeeNumbers = workermember.groupmember;
+// 	  		alert('employeeNumbers'+employeeNumbers);
+// 	  		console.log('employeeNumbers'+employeeNumbers);
+// 	  		for(var i = 0; i<employeeNumbers.length; i++){
+// 	  		if( employeeNumbers[i] != '' ){
+//	  		$("#employeecontent").append("<tr><td> </td><td>"+employeeNumbers[i]+"</td><td> </td></tr>");
+// 	  		var now = new Date().Format("yyyy-MM-dd hh:mm:ss");
+// 	      	createdate = JSON.stringify(now.toLocaleString());
+//	      	var groupdate = createdate;
+//          employeecontent(createdate,employeeNumbers[i]);
+//		    }
+//		   }
+//	}
+
+
+
+	  function selectProjname(){
+      var headerH = 0;
+      var footerH = 0;
+      var H = api.winHeight - headerH - footerH;
+      var frameH = H/2;
+      var frameY = H/4;
+      if(user.station == "发货"){
+        api.openFrame({
+              name: 'shipments',
+              url: './shipments.html',
+              bounces: false,
+              bgColor:'#ffffff',
+              rect: {
+                   x:0,
+                   y:frameY,
+                   w:'auto',
+                   h:frameH  }
+          });
+      }
+      else{
+        api.openFrame({
+              name: 'selectProjname',
+              url: './selectProjname.html',
+              bounces: false,
+              bgColor:'#ffffff',
+              rect: {
+                   x:0,
+                   y:frameY,
+                   w:'auto',
+                   h:frameH  }
+          });
+      }
+	  }
+
+	  function getInfo(){
+	  	var headerH = 0;
+		var footerH = 0;
+	    var frameH = api.winHeight - headerH - footerH;
+	  	api.openFrame({
+            name: 'getInfo',
+            url: './getInfo.html',
+            bounces: false,
+            bgColor:'#ffffff',
+            rect: {
+              	 x:0,
+    			 y:headerH,
+    			 w:'auto',
+			     h:frameH  }
+        });
+	  }
+
+
+	Date.prototype.Format = function(fmt)
+        { //author: meizz
+  			var o = {
+   			 	"M+" : this.getMonth()+1,                 //月份
+    			"d+" : this.getDate(),                    //日
+    			"h+" : this.getHours(),                   //小时
+    			"m+" : this.getMinutes(),                 //分
+    			"s+" : this.getSeconds(),                 //秒
+    			"q+" : Math.floor((this.getMonth()+3)/3),
+    			"S"  : this.getMilliseconds()             //毫秒
+  			};
+  			if(/(y+)/.test(fmt))
+   			 fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+  			for(var k in o)
+   				 if(new RegExp("("+ k +")").test(fmt))
+  			 fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+  			return fmt;
+		}
+	</script>
+
+<script>
+	apiready = function(){
+		db = api.require('db');
+		user = $api.getStorage(config.USER_KEY);
+		group = $api.getStorage(config.GROUP_KEY);
+		$("#createBtn").click(createGroup);
+		$("#deleteBtn").click(deleteGroup);
+    updateGroup(function(){
+      renderGroup();
+    });
+		db.openDatabase({
+			name : config.DB_NAME,
+      path : config.DB_PATH
+		}, function(ret, err){
+			if (ret.status){
+				executeSql(db, config.TABLE_BARCODE, function(){
+					renderBarinfos()
+				}, function(errMsg){
+					alert("数据库建表失败!错误:" + errMsg)
+				})
+   			}else{
+				alert("本地数据库获打开失败!错误：" + err.msg)
+			}
+		});
+
+	 }
+	var createGroup=function(){
+
+		updateGroup(function(flag){
+			if(flag){
+				renderGroup();
+				alert("你已经在小组中了!")
+			}else{
+				var headerH = 0;
+				var footerH = 0;
+				var H = api.winHeight - headerH - footerH;
+				var frameH = H/2;
+				var frameY = H/4;
+		  		api.openFrame({
+		        	name: 'creategroup',
+		        	url: './createEms.html',
+		        	bounces: false,
+		        	bgColor:'#ffffff',
+		        	rect: {
+		          	 	x:0,
+						y:frameY,
+					 	w:'auto',
+				     	h:frameH  }
+		    	});
+			}
+		})
+
+	};
+	function doDeleteGroup(){
+		get(url.deletegroup+'/'+group._id,function(ret,err){
+			if(err){
+				toast('操作失败!错误:'+err.msg, 3000);
+			}else{
+				$api.rmStorage(config.GROUP_KEY);
+				group = null
+				renderGroup()
+				var sql = 'delete from Barcodetest'
+				executeSql(db, sql, function(){
+					renderBarinfos()
+					toast('操作成功!')
+				}, function(errMsg){
+					toast('删除本地数据时出错,错误:'+errMsg)
+				})
+			}
+		})
+	}
+	var deleteGroup = function(){
+    api.confirm({
+      title:'提示',
+      msg:'是否撤销小组？'
+    },function(ret,err){
+      if(ret.buttonIndex == 2){
+    		uploadBarinfo(function(){
+    			renderBarinfos()
+    			if(barUploadErrorQuee.length == 0){
+    				doDeleteGroup()
+    			}else{
+    				api.confirm({
+    					title:'警告',
+    					msg:'当前小组还包含未上传成功的已经扫码成功的条码，小组撤销后，数据将会被删除，是否确定撤销小组？'
+                    },function(ret,err){
+                    	if(ret.buttonIndex == 1){
+    						doDeleteGroup()
+                    	}
+                    });
+    			}
+    		})
+      }
+      else{
+        toast('取消成功')
+      }
+    })
+	}
+
+  var exit = function(){
+    api.confirm({
+      title:'提示',
+      msg:'是否退出登录？'
+    },function(ret,err){
+      if(ret.buttonIndex == 2){
+        var sql = 'delete from Barcodetest'
+				executeSql(db, sql, function(){
+          $api.rmStorage(config.USER_KEY);
+          $api.rmStorage(config.GROUP_KEY);
+          api.openFrame({
+		        	name: 'returnlogin',
+		        	url: './login.html',
+		        	bounces: false,
+		        	bgColor:'#ffffff',
+		        	rect: {
+		          	 	x:0,
+						      y:0,
+					 	      w:'auto',
+				     	    h:'auto'  }
+		    	   });
+					toast('操作成功!')
+				}, function(errMsg){
+					toast('删除本地数据时出错,错误:'+errMsg)
+				})
+        return
+      }else{
+        toast('取消退出!')
+      }
+    })
+  }
+//		var root = $api.getStorage('groupInfo');
+//		console.log("grinfo"+JSON.stringify(root));
+//		if(root == "true"){
+//			var deleteGroup=confirm("是否撤销该组？")
+// 			if(deleteGroup==true){
+//  				var id = $api.getStorage('groupid');
+//  				var groupid = JSON.stringify(id.groupid);
+//  				console.log("removegroupid:"+groupid);
+// 				post(url.deletegroup+'/'+groupid,{},function(ret,err){
+// 				console.log('deletegroup');
+//					if(ret.retStatus =='OK'){
+//						//$api.setStorage('groupid',null);
+//						console.log('delete-success');
+//						alert(JSON.stringify(ret));
+//						alert("更新成功！");
+//						console.log("ret:"+JSON.stringify(ret));
+//						var employeedb = api.require('db');
+//  	    			employeedb.executeSql({
+//     			 			name:'groupTable',
+//     						sql: 'delete from Workgroup'
+//  	  		   		 }, function(ret, err){
+//      					if (ret.status) {
+//      						alert("本地撤销成功");
+// 	      						$("#deleteBtn").hide();
+// 	  							$("#createBtn").show();
+//
+// 		                         employeeInfo = $api.getStorage('userInfo');
+// 		                         $("#employeecontent").html("<tr><td>"+employeeInfo.workname+"</td><td>"+employeeInfo.workid+"</td><td>"+employeeInfo.tel+"</td></tr>");
+//								 $("#employeeStation").html(employeeInfo.station);
+// 	  							//employeeInfo();
+// 	  							var deleteGroup='remove';
+// 	     				 		$api.setStorage('groupStatus',deleteGroup);
+//      					}else {
+//          					alert("本地撤销失败："+JSON.stringify(err));
+//     				     	 }
+//        				});
+//					 }
+//				 });
+//        	}
+//		}else{
+//      	alert("对不起，你没有权限");
+//      }
+//	};
+
+// $("#deleteBtn2").click(function(){
+//		alert("撤销");
+//			var deleteGroup=confirm("是否撤销该组？")
+// 			if(deleteGroup==true){
+//						var employeedb = api.require('db');
+//  	    			employeedb.executeSql({
+//     			 			name:'groupTable',
+//     						sql: 'delete from Workgroup'
+//  	  		   		 }, function(ret, err){
+//      					if (ret.status) {
+//      						alert("本地撤销成功");
+// 	      						$("#deleteBtn").hide();
+// 	  							$("#createBtn").show();
+// 	  							var deleteGroup='remove';
+// 	     				 		$api.setStorage('groupStatus',deleteGroup);
+//
+//      					}else {
+//          					alert("本地撤销失败："+JSON.stringify(err));
+//     				     	 }
+//        				});
+//        	}
+//		});
+
+//	    flag=$api.getStorage('groupStatus');
+//	    console.log("keyopen:"+flag);
+//	 	 if(flag=='create'){
+// 	    	$("#createBtn").hide();
+// 	 		$("#deleteBtn").show();
+// 	 		$api.rmStorage('groupStatus');
+// 	 		console.log(1111);
+// 	 	}else{
+//	 	     	$("#createBtn").show();
+//	 			$("#deleteBtn").hide();
+//	 			$api.rmStorage('groupStatus');
+//	 	}
+//	}
+
+</script>
+</head>
+<body >
+<div class="total-height">
+	<div class="inline1">
+       <!--  <button onclick="javascript:window.location.href='sorttoday.html'">登&nbsp;&nbsp;&nbsp;录</button> -->
+        <button class="smallbtn button-left" onclick="selectProjname()">更新</button>
+        <!-- <div class="centerout centerout-station" onclick="api.closeWin()" id="employeeStation"></div> -->
+       <!--  <h2 class="centerout"><div class="centerout-station" onclick="api.closeWin()" id="employeeStation"></div>岗位</h2> -->
+        <output class="centerout"><h2 id="employeeStation">岗位</h2></output>
+        <button class="smallbtn button-left" onclick="uploadData()">上传</button>
+        <div class="button-left">
+          <label>备注</label>
+          <input type="text" class="remark-text"  id="remark"/>
+        </div>
+        <div class='button-right'>
+          <input type="checkbox"  class='demandall' name="demandall" id="isShowAll" onclick="renderBarinfos()" checked="checked">&nbsp;显示所有
+        </div>
+	</div>
+
+	<div class="mainheight">
+    	<div class="scanstyle">
+			<div class="tablew">
+				<div>
+		 		<table class="tablestyle">
+		 			<colgroup>
+		 				<col width="20%">
+						<col width="60%">
+						<col width="20%">
+					</colgroup>
+		 			<thead>
+		 				<tr>
+		 					<th>序号</th>
+		 					<th>条码</th>
+		 					<th>核对</th>
+		 				</tr>
+		 			</thead>
+		 		</table>
+		 		</div>
+				<div class="addScan-tbody">
+			    <table class="tablestyle">
+		 			<colgroup>
+	            		<col width="20%">
+	            		<col width="60%">
+	            		<col width="20%">
+	        		</colgroup>
+		 			<tbody  id="scannercontent">
+		 			</tbody>
+		 		</table>
+		 		</div>
+			</div>
+			<div class="btn">
+				<button class="scanbtn button-right" onclick="Scanner()">扫一扫</button>
+        <button class="scanbtn button-right" onclick="exit()">退出登录</button>
+				<button class="scanbtn button-left" onclick="addscanner()">条码添加</button>
+			</div>
+		</div>
+    	<div class="employstyle">
+    		<div class="tableww">
+    			<div class="addEmploy">
+    			<div class="addEmploy-thead">
+    			<table class="tablestyle">
+    				<colgroup>
+		 				<col width="30%">
+						<col width="30%">
+						<col width="40%">
+					</colgroup>
+					<thead>
+						<tr>
+							<th colspan="3"><div style="position:relative;float:left;left:50%"><h4 style="position:relative;float:left;left:-50%">建组信息</h4></div>
+							<button style="float:right;" class="button button-primary button-box button-small createBtn" id="createBtn">
+   							<i class="fa fa-user-plus f"></i></button>
+   							<button style="float:right;" class="button button-primary button-box button-small deleteBtn" id="deleteBtn">
+   							<i class="fa fa-trash-o " ></i></button>
+							</th>
+						</tr>
+						<!--<tr>
+         					<th>姓名</th>
+         					<th>员工号</th>
+         					<th>手机号</th>
+         				</tr>-->
+					</thead>
+				</table>
+    			</div>
+    		<div class="addEmploy-tbody">
+    			<table class="tablestyle">
+    				<colgroup>
+	            		<col width="30%">
+	            		<col width="30%">
+	            		<col width="40%">
+	        		</colgroup>
+	     			<tbody id="employeecontent">
+       				</tbody>
+      			 </table>
+				</div>
+       		  </div>
+			</div>
+        	<div class="history-btn">
+    			<button  onclick="getInfo()">历史查询</button>
+     <!-- <button onclick="removegroup()">撤销</button>
+      <button onclick="creategroup()">创建</button> -->
+    			</div>
+			</div>
+	</div>
+</div>
+</body>
+</html>

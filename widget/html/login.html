@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="keyword" content="绑定界面">
+    <meta name="viewport" content="width=device-width">
+    <title>宝业幕墙</title>
+    <link rel="stylesheet" type="text/css" href="../css/reset.css">
+    <link rel="stylesheet" type="text/css" href="../css/login.css">
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <script type="text/JavaScript" src="../js/jquery-3.1.0.min.js"></script>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/JavaScript" src="../js/config.js"></script>
+           <script type="text/JavaScript" src="../js/common.js"></script>
+    <style>
+    	.button{
+    		margin-top:20px;
+    	}
+    </style>
+	<script>
+
+ 		function login2(){
+ 			api.openWin({
+ 	            name: 'scanner',
+ 	            url: 'scanner.html'
+           });
+ 		}
+	apiready = function(){
+
+ 		$("#login").click(function(){
+      erplogin('superAdmin','111111','saas');
+			var workid = $("#workid").val();
+			var password = $("#password").val();
+
+//			var userdata = {
+//				workid : workid,
+//				deviceid : api.deviceId,
+//				password : password
+//			};
+//
+			login(workid, password, function(user){
+
+				$api.setStorage(config.USER_KEY,user);
+				api.openWin(pages.scanner)
+
+			}, function(err){
+
+				alert("登陆失败!错误："+err);
+
+			})
+		});
+
+	}
+	</script>
+</head>
+<body>
+<div class="header">
+    <img class="top_bg" src="../images/top.png" alt="" />
+</div>
+<div class="wrap">
+    <div class="cp_log">
+        <img src="../images/baoye_logo.png" alt=""/>
+    </div>
+    <div class="main">
+        <div class="admin">
+            <span>员工号</span>
+            <input type="text" id="workid" placeholder="请输入用户名"/>
+        </div>
+        <div class="password">
+            <span>密&nbsp;&nbsp;&nbsp;码</span>
+            <input type="text" id="password" placeholder="请输入密码"/>
+        </div>
+        <div class="btn">
+        <button class="button" id="login">登&nbsp;&nbsp;&nbsp;录</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

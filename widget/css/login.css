@@ -1,0 +1,67 @@
+* {
+    padding: 0;
+    margin:  0;
+    box-sizing: border-box;
+}
+
+html,body {
+    font-family: "Microsoft Yahei",sans-serif;
+    background: #E5E5E5;
+}
+
+.top_bg {
+    width: 100%;
+}
+
+.cp_log {
+   width: 50%;
+    margin: 0 auto;
+    margin-top: 10%;
+    height: 20%;
+}
+
+.cp_log img {
+    width: 100%;
+    height: 100%;
+}
+
+.bangding {
+    font-size: 18px;
+    text-align: center;
+}
+
+.main {
+    margin-top: 11%;
+}
+
+.admin,.password {
+    width: 65%;
+    margin: 0 auto;
+    margin-top: 7%;
+}
+
+span {
+    margin-right: 5%;
+}
+
+.main input {
+    width: 69%;
+    height: 30px;
+}
+
+.btn {
+    width: 65%;
+    margin: 0 auto;
+    margin-top: 5%;
+}
+
+.btn button {
+    width: 94%;
+    height: 30px;
+    font-size: 17px;
+    color: white;
+    background: #0168B7;
+    border: none;
+    border-radius: 5px;
+    font-family: "Microsoft Yahei",sans-serif;
+}
