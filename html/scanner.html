@@ -773,9 +773,11 @@
 //		   }
 //	}
 
+    function selectProjname(){
+      updateGroup(openSelectProj());
+    }
 
-
-	  function selectProjname(){
+	  function openSelectProj(){
       var headerH = 0;
       var footerH = 0;
       var H = api.winHeight - headerH - footerH;

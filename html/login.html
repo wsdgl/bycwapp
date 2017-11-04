@@ -27,10 +27,28 @@
  		}
 	apiready = function(){
 
+    $("#ipAddress").click(function(){
+      var headerH = 0;
+      var footerH = 0;
+      var H = api.winHeight - headerH - footerH;
+      var frameH = H/2;
+      var frameY = H/4;
+        api.openFrame({
+            name: 'setIp',
+            url: './setIp.html',
+            bounces: false,
+            bgColor:'#ffffff',
+            rect: {
+                 x:0,
+                 y:frameY,
+                 w:'auto',
+                 h:frameH  }
+        });
+    });
+
  		$("#login").click(function(){
       var ipAddress = $('#ipAddress').val();
       $api.setStorage(config.IP, ipAddress);
-      console.log(config.ServerIp);
       erplogin('superAdmin','111111','saas');
 			var workid = $("#workid").val();
 			var password = $("#password").val();
@@ -73,12 +91,11 @@
             <span>密&nbsp;&nbsp;&nbsp;码</span>
             <input type="text" id="password" placeholder="请输入密码"/>
         </div>
-        <div class="ipAddress">
-            <span>IP地址</span>
-            <input type="text" id="ipAddress"/>
-        </div>
         <div class="btn">
             <button class="button" id="login">登&nbsp;&nbsp;&nbsp;录</button>
+        </div>
+        <div class="btn">
+            <button class="button" id="ipAddress">修改IP地址</button>
         </div>
     </div>
 </div>

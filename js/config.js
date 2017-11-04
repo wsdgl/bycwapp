@@ -1,7 +1,7 @@
 var config={
 	//ServerIp:'http://192.168.6.104:8089'
 	//ServerIp:'http://192.168.125.118:8089'
-	ServerIp:'http://'+$api.getStorage('ipAddress')+':8089'
+	ServerIp:'http://192.168.6.110:8089'
 }
 
 var url={
@@ -16,7 +16,7 @@ var url={
 	clearbar:config.ServerIp+'/barCode/deleteBarScanInfoOnSvr',
 	erplogin: config.ServerIp+'/users/login',
 	getCurrentOrders: config.ServerIp+'/aluveneerOrders/getCurrentOrders',
-	getCurrentGoodsOut: config.ServerIp+'/goodsOut/getCurrentGoodsOutNote',
+	getCurrentGoodsOut: config.ServerIp+'/goodsOutNotes/getCurrentGoodsOutNote',
 	getGoodsOutBarCode: config.ServerIp+'/barCode/getGoodsOutBarList'
 };
 var config={
