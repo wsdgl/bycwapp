@@ -27,24 +27,33 @@
 	      });
 			});
 
-			get(url.getCurrentOrders, function(ret, err){
+			get(url.getCurrentGoodsOut, function(ret, err){
 				if(err){
 					toast('获取订单失败'+err.msg);
 				}
 				else{
 					if(ret.retStatus == 'OK'){
 						for(var i=0; i<ret.retValue.length; i++){
-								$('#select_orders').append("<div><input type='radio' data-name=" + ret.retValue[i].projectName.name + " data-id="+ret.retValue[i].cgdh+" class='selectproj' /> "+
-								"<output class='projname'>"+ret.retValue[i].projectName.name + ' ' + "</output>"+
-								"<output class='cgdh'>"+ ret.retValue[i].cgdh +"</output></div>");
+								$('#select_orders').append("<div><input type='radio' data-name=" + ret.retValue[i].name + " class='selectproj' /> "+
+								"<output class='projname'>"+ret.retValue[i].name + ' ' + "</output>");
 						}
 					}
 					else{
-						
 						toast('获取订单失败');
 					}
 				}
 			})
+
+			function uploadGoodsOutBarCode(){
+				var name = $('#select_orders .selectproj:checked').attr('data-name');
+				console.log('name'+name);
+				api.execScript({
+						script: 'updateData('+name+')'
+				});
+				api.closeFrame({
+						name:'shipments'
+				});
+			}
 	};
 	</script>
 </head>
@@ -55,7 +64,7 @@
 		<div class="select" id="select_plan"></div>
 		<div class="clearfix"></div>
 		<div class="bottom-btn">
-			<button class="button button-primary button-rounded button-small " onclick="">确定</button>
+			<button class="button button-primary button-rounded button-small " onclick="uploadGoodsOutBarCode()">确定</button>
 			<button class="button button-primary button-rounded button-small " id="cancel">取消</button>
 
 		</div>

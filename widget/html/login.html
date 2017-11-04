@@ -31,7 +31,7 @@
       erplogin('superAdmin','111111','saas');
 			var workid = $("#workid").val();
 			var password = $("#password").val();
-
+      var ipAddress = $('#ipAddress').val();
 //			var userdata = {
 //				workid : workid,
 //				deviceid : api.deviceId,
@@ -41,6 +41,8 @@
 			login(workid, password, function(user){
 
 				$api.setStorage(config.USER_KEY,user);
+        $api.setStorage(config.IP, ipAddress);
+
 				api.openWin(pages.scanner)
 
 			}, function(err){
@@ -69,6 +71,10 @@
         <div class="password">
             <span>密&nbsp;&nbsp;&nbsp;码</span>
             <input type="text" id="password" placeholder="请输入密码"/>
+        </div>
+        <div class="ipAddress">
+            <span>IP地址</span>
+            <input type="text" id="ipAddress"/>
         </div>
         <div class="btn">
         <button class="button" id="login">登&nbsp;&nbsp;&nbsp;录</button>

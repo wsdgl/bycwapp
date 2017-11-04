@@ -165,8 +165,11 @@
     }
 
     function updateBarinfo(selectProj){//下载条码时如果不同岗位用一个手机登录不应该再显示手机原有的数据，sql语句“INSERT OR REPLACE INTO”应该只在当前岗位，
-    //换了岗位更新时应该覆盖原有数据
+    //换了岗位更新时应该覆盖原有数据\
     	var durl = url.download + '/' +group._id
+      if(user.station == config.SHIPMENTS){
+        durl = url.getGoodsOutBarCode + '/' +group._id
+      }
       var data = {data: selectProj};
     	post(durl, data, function(ret, err){
     		if(err){
@@ -778,7 +781,7 @@
       var H = api.winHeight - headerH - footerH;
       var frameH = H/2;
       var frameY = H/4;
-      if(user.station == "发货"){
+      if(user.station == config.SHIPMENTS){
         api.openFrame({
               name: 'shipments',
               url: './shipments.html',

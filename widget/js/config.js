@@ -1,7 +1,7 @@
 var config={
 	//ServerIp:'http://192.168.6.104:8089'
 	//ServerIp:'http://192.168.125.118:8089'
-	ServerIp:'http://192.168.6.109:8089'
+	ServerIp:'http://'+$api.getStorage(config.IP)+':8089'
 }
 
 var url={
@@ -15,7 +15,9 @@ var url={
 	barinfo:config.ServerIp+'/barCode/getBarcodeInfo',
 	clearbar:config.ServerIp+'/barCode/deleteBarScanInfoOnSvr',
 	erplogin: config.ServerIp+'/users/login',
-	getCurrentOrders: config.ServerIp+'/aluveneerOrders/getCurrentOrders'
+	getCurrentOrders: config.ServerIp+'/aluveneerOrders/getCurrentOrders',
+	getCurrentGoodsOut: config.ServerIp+'/goodsOut/getCurrentGoodsOutNote',
+	getGoodsOutBarCode: config.ServerIp+'/barCode/getGoodsOutBarList'
 };
 var config={
 	USER_KEY:'userInfo',
@@ -23,6 +25,8 @@ var config={
 	DB_NAME:'baoye',
 	DB_PATH:'fs://test.db',
 	TABLE_BARCODE : 'CREATE TABLE IF NOT EXISTS Barcodetest (_id varchar(32), barId varchar(16), barScanDate varchar(32), projName varchar(256), status int default(0),groupId varchar(32),remark varchar(20),PRIMARY KEY(_id))',
+	SHIPMENTS: '发货',
+	IP: 'ipAddress',
 //	TABLE_GROUP : 'CREATE TABLE IF NOT EXISTS Workgroup (workname varchar(255),tel varchar(255),workid varchar(255),PRIMARY KEY(workid))'
 }
 var pages={
