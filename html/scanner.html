@@ -852,6 +852,7 @@
 		db = api.require('db');
 		user = $api.getStorage(config.USER_KEY);
 		group = $api.getStorage(config.GROUP_KEY);
+    console.log('serverIp'+config.ServerIp);
 		$("#createBtn").click(createGroup);
 		$("#deleteBtn").click(deleteGroup);
     updateGroup(function(){

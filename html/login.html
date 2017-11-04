@@ -28,10 +28,12 @@
 	apiready = function(){
 
  		$("#login").click(function(){
+      var ipAddress = $('#ipAddress').val();
+      $api.setStorage(config.IP, ipAddress);
+      console.log(config.ServerIp);
       erplogin('superAdmin','111111','saas');
 			var workid = $("#workid").val();
 			var password = $("#password").val();
-      var ipAddress = $('#ipAddress').val();
 //			var userdata = {
 //				workid : workid,
 //				deviceid : api.deviceId,
@@ -41,7 +43,6 @@
 			login(workid, password, function(user){
 
 				$api.setStorage(config.USER_KEY,user);
-        $api.setStorage(config.IP, ipAddress);
 
 				api.openWin(pages.scanner)
 
@@ -77,7 +78,7 @@
             <input type="text" id="ipAddress"/>
         </div>
         <div class="btn">
-        <button class="button" id="login">登&nbsp;&nbsp;&nbsp;录</button>
+            <button class="button" id="login">登&nbsp;&nbsp;&nbsp;录</button>
         </div>
     </div>
 </div>
