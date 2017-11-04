@@ -34,7 +34,7 @@
 				else{
 					if(ret.retStatus == 'OK'){
 						for(var i=0; i<ret.retValue.length; i++){
-								$('#select_orders').append("<div><input type='checkbox' data-name=" + ret.retValue[i].projectName.name + " data-id="+ret.retValue[i].cgdh+" class='selectproj' /> "+
+								$('#select_orders').append("<div><input type='radio' data-name=" + ret.retValue[i].projectName.name + " data-id="+ret.retValue[i].cgdh+" class='selectproj' /> "+
 								"<output class='projname'>"+ret.retValue[i].projectName.name + ' ' + "</output>"+
 								"<output class='cgdh'>"+ ret.retValue[i].cgdh +"</output></div>");
 						}
@@ -51,7 +51,6 @@
 <body>
 	<div class="proj">
 	  <h4>选择发货计划：</h4>
-		<div class="clearfix"></div>
 		<div class="clearfix"></div>
 		<div class="select" id="select_plan"></div>
 		<div class="clearfix"></div>
