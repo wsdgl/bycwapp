@@ -33,8 +33,9 @@
 				}
 				else{
 					if(ret.retStatus == 'OK'){
+						console.log('返回'+ret.retValue[0].name);
 						for(var i=0; i<ret.retValue.length; i++){
-								$('#select_orders').append("<div><input type='radio' data-name=" + ret.retValue[i].name + " class='selectproj' /> "+
+								$('#select_plan').append("<div><input type='radio' data-name=" + ret.retValue[i].name + " class='selectproj' /> "+
 								"<output class='projname'>"+ret.retValue[i].name + ' ' + "</output>");
 						}
 					}
@@ -43,18 +44,21 @@
 					}
 				}
 			})
-
-			function uploadGoodsOutBarCode(){
-				var name = $('#select_orders .selectproj:checked').attr('data-name');
-				console.log('name'+name);
-				api.execScript({
-						script: 'updateData('+name+')'
-				});
-				api.closeFrame({
-						name:'shipments'
-				});
-			}
 	};
+	function uploadGoodsOutBarCode(){
+		var name = $('#select_plan .selectproj:checked').attr('data-name');
+		var data = {
+			name: name
+		}
+		data = JSON.stringify(data);
+		console.log('data'+data);
+		api.execScript({
+				script: 'updateData('+data+')'
+		});
+		api.closeFrame({
+				name:'shipments'
+		});
+	}
 	</script>
 </head>
 <body>
