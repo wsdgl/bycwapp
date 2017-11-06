@@ -2,7 +2,7 @@
 var config={
 	//ServerIp:'http://192.168.6.104:8089'
 	//ServerIp:'http://192.168.125.118:8089'
-	ServerIp:'http://192.168.6.107:8089'
+	ServerIp:'http://'+$api.getStorage('ipAddress')+':8089'
 }
 
 var url={
