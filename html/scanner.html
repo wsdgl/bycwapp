@@ -775,7 +775,15 @@
 //	}
 
     function selectProjname(){
-      updateGroup(openSelectProj());
+      get(url.downloadgroup + '/' + user._id, function(ret, err){
+    		if(err){
+    			alert("查询组信息失败!错误:" + err.msg)
+    		}else if(ret.retStatus == 'OK'){
+    			openSelectProj();
+    		}else{
+    			alert("你还没有加入或者创建小组!")
+    		}
+    	})
     }
 
 	  function openSelectProj(){
@@ -816,7 +824,7 @@
 	  	var headerH = 0;
 		var footerH = 0;
 	    var frameH = api.winHeight - headerH - footerH;
-	  	api.openFrame({
+	  	api.openWin({
             name: 'getInfo',
             url: './getInfo.html',
             bounces: false,
@@ -856,6 +864,25 @@
 		user = $api.getStorage(config.USER_KEY);
 		group = $api.getStorage(config.GROUP_KEY);
     console.log('serverIp'+config.ServerIp);
+
+    var current = 0;
+    api.addEventListener({
+            name : 'keyback'
+    }, function(ret, err) {
+            if ((new Date().getTime() - current) > 2000) {
+                    current = new Date().getTime();
+                    api.toast({msg:'再按一次退出' + api.appName});
+            } else {
+                    api.closeWidget({
+                            id : api.appId,
+                            silent : true,
+                            animation : {
+                                    type : 'fade',
+                                    duration : 150
+                            }
+                    });
+            }
+    });
 		$("#createBtn").click(createGroup);
 		$("#deleteBtn").click(deleteGroup);
     updateGroup(function(){
@@ -957,7 +984,7 @@
       $api.rmStorage(config.GROUP_KEY);
       api.closeWin({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});
       api.openWin({
-          name: 'returnlogin',
+          name: 'login',
           url: './login.html',
           bounces: false,
           bgColor:'#ffffff',
@@ -968,9 +995,9 @@
               h:'auto'  }
          });
          toast('操作成功!')
-        }, function(errMsg){
-          toast('删除本地数据时出错,错误:'+errMsg)
-        })
+    }, function(errMsg){
+        toast('删除本地数据时出错,错误:'+errMsg)
+       })
   };
 
   var exit = function(){

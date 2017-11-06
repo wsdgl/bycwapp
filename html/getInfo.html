@@ -28,6 +28,21 @@
 				var today = year+'-'+month+'-'+day
 				 $("#start-date").val(today);
 				 $("#end-date").val(today);
+
+				 api.addEventListener({
+						 name: 'keyback'
+				 }, function(ret, err){
+					 console.log('ret'+ret)
+						 if( ret ){
+									api.openWin({
+											name: 'scanner',
+											url: './scanner.html'
+									});
+
+						 }else{
+									alert( JSON.stringify( err ) );
+						 }
+				 });
 			}
 			function history() {
 				var startdate = $("#start-date").val();
