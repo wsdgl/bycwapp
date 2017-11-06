@@ -177,6 +177,7 @@
     		}else{
     			if(ret.retStatus == 'OK'){
      				barCodes = ret.retValue
+            console.log(JSON.stringify(barCodes));
                     //barCodes = ret.retValue
     				updateBarinfoSqlite(0, function(){
     					renderBarinfos();
@@ -947,7 +948,30 @@
         toast('取消成功')
       }
     })
-	}
+	};
+
+  var doExit = function(){
+    var sql = 'delete from Barcodetest'
+    executeSql(db, sql, function(){
+      $api.rmStorage(config.USER_KEY);
+      $api.rmStorage(config.GROUP_KEY);
+      api.closeWin({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});
+      api.openWin({
+          name: 'returnlogin',
+          url: './login.html',
+          bounces: false,
+          bgColor:'#ffffff',
+          rect: {
+              x:0,
+              y:0,
+              w:'auto',
+              h:'auto'  }
+         });
+         toast('操作成功!')
+        }, function(errMsg){
+          toast('删除本地数据时出错,错误:'+errMsg)
+        })
+  };
 
   var exit = function(){
     api.confirm({
@@ -955,26 +979,20 @@
       msg:'是否退出登录？'
     },function(ret,err){
       if(ret.buttonIndex == 2){
-        var sql = 'delete from Barcodetest'
-				executeSql(db, sql, function(){
-          $api.rmStorage(config.USER_KEY);
-          $api.rmStorage(config.GROUP_KEY);
-          api.openFrame({
-		        	name: 'returnlogin',
-		        	url: './login.html',
-		        	bounces: false,
-		        	bgColor:'#ffffff',
-		        	rect: {
-		          	 	x:0,
-						      y:0,
-					 	      w:'auto',
-				     	    h:'auto'  }
-		    	   });
-					toast('操作成功!')
-				}, function(errMsg){
-					toast('删除本地数据时出错,错误:'+errMsg)
-				})
-        return
+        if(barUploadErrorQuee.length == 0){
+            doExit();
+            return
+        }
+        else{
+          api.confirm({
+            title:'警告',
+            msg:'当前小组还包含未上传成功的已经扫码成功的条码，退出后，数据将会被删除，是否确定撤销小组？'
+          },function(ret,err){
+              if(ret.buttonIndex == 1){
+                doExit();
+              }
+          });
+        }
       }else{
         toast('取消退出!')
       }

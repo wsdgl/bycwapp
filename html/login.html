@@ -47,8 +47,7 @@
     });
 
  		$("#login").click(function(){
-      var ipAddress = $('#ipAddress').val();
-      $api.setStorage(config.IP, ipAddress);
+      console.log($api.getStorage(config.IP));
       erplogin('superAdmin','111111','saas');
 			var workid = $("#workid").val();
 			var password = $("#password").val();
@@ -61,7 +60,7 @@
 			login(workid, password, function(user){
 
 				$api.setStorage(config.USER_KEY,user);
-
+        api.closeWin({name:'login', url:'../html/login.html', animation:{type: 'none'}});
 				api.openWin(pages.scanner)
 
 			}, function(err){
