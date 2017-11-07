@@ -472,20 +472,21 @@
 		});
 	}
  	function addscanner(){
- 		var root = $api.getStorage('groupInfo');
-		console.log("grinfo"+JSON.stringify(root));
-		if(root == "true"){
+ 	// 	var root = $api.getStorage('groupInfo');
+		// console.log("grinfo"+JSON.stringify(root));
+		// if(root == "true"){
           scannerNum = window.prompt("请输入条码号：");
           if(scannerNum != null){
           	var now = new Date().Format("yyyy-MM-dd hh:mm:ss");
             barscandate = JSON.stringify(now.toLocaleString());
             var scanstatus = 'scanned';
             console.log("scannerNum:"+scannerNum);
-            updateBarCodeInfo(scanstatus,groupNumber,barscandate,scannerNum);//将插入改为更新
+            var groupId = group._id;
+            updateBarCodeInfo(scannerNum);//将插入改为更新
           }
-		}else{
-        	alert("对不起，你没有权限");
-        }
+		// }else{
+    //     	alert("对不起，你没有权限");
+    //     }
 	}
 	function Scanner(){
 		if(true){
@@ -595,23 +596,36 @@
 //
 //	}
 
-	function updateBarCodeInfo(scanned,groupNumber,barscandate,barid){
-		var db = api.require('db');
-		db.executeSql({
-	        name:'barcodeTable',
-	        sql:'UPDATE Barcodetest SET scanstatus = \''+scanned+'\', groupNumber = '+ groupNumber +',scantime = '+barscandate +' WHERE barid =\''+barid+'\''
-        },function(ret,err){
-        	if(ret.status){
-//      		$api.setStorage(updateBarInfo,ret.data);
- 	     		console.log("条码表修改成功:"+JSON.stringify(ret));
-    			selectcontent();
-//  		   console.log("updatebarinfo:"+JSON.stringify(updatebar));
-        	}else{
-        		alert(JSON.stringify(err));
-        		console.log("errbarid"+JSON.stringify(err));
-				alert("条码表更新失败！");
-        	}
-        });
+	function updateBarCodeInfo(barid){
+		//var db = api.require('db');
+    var ssql = 'select * from Barcodetest  WHERE barId LIKE \'%'+barid+'%\''
+    console.log(ssql);
+    selectSql(db, ssql, function(data){
+        if(data.length==0){
+          toast('该条码在本地不存在!')
+        }else{
+          console.log(JSON.stringify(data));
+          if(data[0].status==0){
+            var barId = data[0].barId;
+            var sql = 'update Barcodetest set status = 1,barScanDate=\''+new Date().getTime()+'\' where barId = \''+barId+'\''
+            executeSql(db, sql, function(){
+
+              var bar = {
+                  barId:barId,
+                  barScanDate:new Date().getTime(),
+                  groupId:group._id,
+                  remark:$('#remark').val()
+              }
+              renderBarinfos()
+              uploadBar(bar)
+            }, function(errMsg){
+            toast('本地数据更新失败！错误:'+errMsg)
+          })
+          }else{
+            toast('该条码已经扫过了！重复扫描无效!')
+          }
+      }
+    })
 	}
 
 	function selectcontent(){
