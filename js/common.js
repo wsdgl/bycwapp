@@ -15,10 +15,10 @@ function erplogin(user, pass, db) {
 }, function(ret, err) {
     if (ret) {
         // api.alert({ msg: (ret+'OK') });
-				console.log("88888888");
 				console.log(ret+'OK');
     } else {
-        api.alert({ msg: ('ERR'+err) });
+			  console.log(JSON.stringify(err));
+        api.alert({ msg: ('ERR'+err.msg) });
     }
 });
 }

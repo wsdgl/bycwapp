@@ -29,7 +29,7 @@
 
 			get(url.getCurrentGoodsOut, function(ret, err){
 				if(err){
-					toast('获取订单失败'+err.msg);
+					toast('获取发货计划失败'+err.msg);
 				}
 				else{
 					if(ret.retStatus == 'OK'){
@@ -40,7 +40,7 @@
 						}
 					}
 					else{
-						toast('获取订单失败');
+						toast('发货计划为空');
 					}
 				}
 			})

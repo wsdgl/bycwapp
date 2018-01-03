@@ -81,12 +81,19 @@
 					}
 				});
 			}
+
+			function closeGetInfo(){
+				api.closeFrame({
+				    name: 'getInfo'
+				});
+
+			}
 		</script>
 	</head>
 	<body>
 		<div class="scanner-history">
 			<div class="header">
-				<div class="header-left" onclick="api.closeFrame();">
+				<div class="header-left" onclick="closeGetInfo()">
 					<i class="fa fa-mail-reply fa-2x" ></i>
 				</div>
 				<div class="header-center">
