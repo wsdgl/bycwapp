@@ -99,7 +99,7 @@
     var updateBarInfo = "updateBarInfo";
 
     function updateGroup(cb){
-      console.log("user._id"+user._id);//user._id传过去就变成workid？
+      console.log("user._id:"+user._id);//user._id传过去就变成workid？
     	get(url.downloadgroup + '/' + user._id, function(ret, err){
     		if(err){
     			alert("查询组信息失败!错误:" + err.msg)
@@ -315,7 +315,7 @@
       			})
           });
       }, function(){
-        toast('备注插入失败');
+        toast('执行失败');
         cb();
       })
 
@@ -606,21 +606,25 @@
         }else{
           console.log(JSON.stringify(data));
           if(data[0].status==0){
-            var barId = data[0].barId;
-            var sql = 'update Barcodetest set status = 1,barScanDate=\''+new Date().getTime()+'\' where barId = \''+barId+'\''
-            executeSql(db, sql, function(){
-
-              var bar = {
-                  barId:barId,
-                  barScanDate:new Date().getTime(),
-                  groupId:group._id,
-                  remark:$('#remark').val()
+              if(data.length == 1){
+                  var barId = data[0].barId;
+                  var sql = 'update Barcodetest set status = 1,barScanDate=\''+new Date().getTime()+'\' where barId = \''+barId+'\''
+                  executeSql(db, sql, function(){
+                    var bar = {
+                        barId:barId,
+                        barScanDate:new Date().getTime(),
+                        groupId:group._id,
+                        remark:$('#remark').val()
+                    }
+                    renderBarinfos()
+                    uploadBar(bar)
+                  }, function(errMsg){
+                  toast('本地数据更新失败！错误:'+errMsg)
+                })
               }
-              renderBarinfos()
-              uploadBar(bar)
-            }, function(errMsg){
-            toast('本地数据更新失败！错误:'+errMsg)
-          })
+              else{
+                toast('检查到有多条条码匹配，请重新输入完整条码')
+              }
           }else{
             toast('该条码已经扫过了！重复扫描无效!')
           }
@@ -838,7 +842,7 @@
 	  	var headerH = 0;
 		var footerH = 0;
 	    var frameH = api.winHeight - headerH - footerH;
-	  	api.openWin({
+	  	api.openFrame({
             name: 'getInfo',
             url: './getInfo.html',
             bounces: false,
@@ -874,11 +878,13 @@
 
 <script>
 	apiready = function(){
+    console.log("6666")
 		db = api.require('db');
 		user = $api.getStorage(config.USER_KEY);
 		group = $api.getStorage(config.GROUP_KEY);
     console.log('serverIp'+config.ServerIp);
-
+    console.log(JSON.stringify(user));
+    console.log(JSON.stringify(group));
     var current = 0;
     api.addEventListener({
             name : 'keyback'
@@ -996,19 +1002,22 @@
     executeSql(db, sql, function(){
       $api.rmStorage(config.USER_KEY);
       $api.rmStorage(config.GROUP_KEY);
-      api.closeWin({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});
-      api.openWin({
+      api.closeFrame({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});
+      console.log($api.getStorage(config.USER_KEY));
+      console.log($api.getStorage(config.GROUP_KEY));
+      api.openFrame({
           name: 'login',
           url: './login.html',
-          bounces: false,
-          bgColor:'#ffffff',
-          rect: {
-              x:0,
-              y:0,
-              w:'auto',
-              h:'auto'  }
+          reload:true
+          // bounces: false,
+          // bgColor:'#ffffff',
+          // rect: {
+          //     x:0,
+          //     y:0,
+          //     w:'auto',
+          //     h:'auto'  }
          });
-         toast('操作成功!')
+    toast('操作成功!')
     }, function(errMsg){
         toast('删除本地数据时出错,错误:'+errMsg)
        })

@@ -49,6 +49,7 @@
         		msg:'你要创建的小组将没有任何组员，是否继续？'
             },function(ret,err){
             	if(ret.buttonIndex == 2){
+								console.log("666");
             		uploadGroup()
             		return
             	}else{
@@ -77,6 +78,7 @@
         			toast('建组成功!')
         			alert('yesyes')
         			api.execScript({
+									frameName:"scanner",
 	                    script: 'updateGroup(renderGroup)'
                     });
         		}

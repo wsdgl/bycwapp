@@ -14,7 +14,9 @@ function erplogin(user, pass, db) {
     }
 }, function(ret, err) {
     if (ret) {
-        api.alert({ msg: (ret+'OK') });
+        // api.alert({ msg: (ret+'OK') });
+				console.log("88888888");
+				console.log(ret+'OK');
     } else {
         api.alert({ msg: ('ERR'+err) });
     }
