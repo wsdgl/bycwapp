@@ -4,14 +4,20 @@
     <meta charset="UTF-8">
    <!--  <meta name="keyword" content="绑定界面"> -->
     <meta name="viewport" content="width=device-width">
+    <meta name="format-detection" content="telephone=no" />
     <title>宝业</title>
     <link rel="stylesheet" type="text/css" href="../css/jquery-ui.css">
-    <link rel="stylesheet"  href="../css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../css/jquery.mobile-1.4.5.min.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="../css/font-awesome.min.css"> -->
+    <link href="http://cdn.bootcss.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../css/api.css"/>
     <link rel="stylesheet" type="text/css" href="../css/buttons.css">
     <link rel="stylesheet" type="text/css" href="../css/bd.css">
+
     <script type="text/JavaScript" src="../js/jquery-3.1.0.min.js"></script>
+    <!-- <script src="http://libs.baidu.com/jquery/1.11.3/jquery.min.js"></script> -->
     <script type="text/JavaScript" src="../js/jquery-ui.js"></script>
+    <!-- <script type="text/JavaScript" src="../js/jquery.mobile-1.4.5.min.js"></script> -->
     <script type="text/javascript" src="../script/api.js"></script>
     <script type="text/JavaScript" src="../js/config.js"></script>
     <script type="text/JavaScript" src="../js/common.js"></script>
@@ -75,6 +81,7 @@
   	var lead = null
   	var group = null
   	var db = null
+    var dialogBox = null
   	var barCodes = []
   	var barUploadQuee = []
   	var barUploadErrorQuee = []
@@ -371,48 +378,109 @@
 				var length4 = barinfos.L4
 				var length5 = barinfos.L5
 				var length6 = barinfos.L6
-				console.log("aluminumNo"+ aluminumNo+projectName );
-				console.log("alumminumName"+alumminumName +singleArea+ isAbnormity+colorNo+figureNo+width+length1+length2+length3+length4+length5+length6);
-				//$(function(){
-					$('.tooltip').tooltip({
-						content:function(){
-							if($(this).is('[title]')){
-							return "<div><dl><dt class='dl-style'>产品名称：</dt><dd id='projName' class='dl-style'>"+projectName+"</dd></dl>"
-                +"<dl><dt class='dl-style'>采购单号：</dt><dd class='dl-style'>"+cgdh+"</dd></dl>"
-								+"<dl><dt class='dl-style'>铝板号：</dt><dd class='dl-style'>"+aluminumNo+"</dd></dl>"
-								+"<dl><dt class='dl-style'>铝板名称：</dt><dd class='dl-style'>"+alumminumName+"</dd></dl>"
-								+"<dl><dt class='dl-style'>单个面积：</dt><dd class='dl-style'>"+singleArea+"</dd></dl>"
- 								+"<dl><dt class='dl-style'>是否异形：</dt><dd class='dl-style'>"+isAbnormity+"</dd></dl>"
- 								+"<dl><dt class='dl-style'>色号：</dt><dd class='dl-style'>"+colorNo+"</dd></dl>"
- 								+"<dl><dt class='dl-style'>图号：</dt><dd class='dl-style'>"+figureNo+"</dd></dl>"
- 								+"<dl><dt class='dl-style'>宽：</dt><dd class='dl-style'>"+width+"</dd></dl>"
- 								+"<dl><dt class='dl-style'>L1：</dt><dd class='dl-style'>"+length1+"</dd>"
- 								+"&nbsp<dt class='dl-style'>L2：</dt><dd class='dl-style'>"+length2+"</dd></dl>"
- 								+"<dl><dt class='dl-style'>L3：</dt><dd class='dl-style'>"+length3+"</dd>"
- 								+"&nbsp<dt class='dl-style'>L4：</dt><dd class='dl-style'>"+length4+"</dd></dl>"
- 								+"<dl><dt class='dl-style'>L5：</dt><dd class='dl-style'>"+length5+"</dd>"
- 								+"&nbsp<dt class='dl-style'>L6：</dt><dd class='dl-style'>"+length6+"</dd></dl>"
-							+"</div>"
-							}
-					   }
-				  });
-			   //});
-			  // $(function(){
-//			   		$('.tooltip').tooltip({
-//			   			position: {
-//      				my: "center bottom-20",
-//      				at: "center top",
-//      				using: function( position, feedback ) {
-//        					$( this ).css( position );
-//        						$( "<div>" )
-//          						.addClass( "arrow" )
-//          						.addClass( feedback.vertical )
-//          						.addClass( feedback.horizontal )
-//          						.appendTo( this );
-//      			   	}
-//    				 	}
-//			   		});
-			 //  });
+				//console.log("aluminumNo"+ aluminumNo+projectName );
+				//console.log("alumminumName"+alumminumName +singleArea+ isAbnormity+colorNo+figureNo+width+length1+length2+length3+length4+length5+length6);
+
+        dialogBox.receipt({
+           rect: {
+               w: 300,
+               h: 360
+           },
+           tapClose: true,
+           items: [{
+               key: '工程名称',
+               value: projectName
+           }, {
+               key: '采购单号',
+               value: cgdh
+           }, {
+               key: '铝板号',
+               value: aluminumNo
+           }, {
+               key: '铝板名称',
+               value: alumminumName
+           }, {
+               key: '单个面积',
+               value: singleArea
+           }, {
+               key: '是否异形',
+               value: isAbnormity
+           },{
+               key: '色号',
+               value: colorNo
+           },{
+               key: '图号',
+               value: figureNo
+           },{
+               key: '宽',
+               value: width
+           },{
+               key: 'L1',
+               value: length1
+           },{
+               key: 'L2',
+               value: length2
+           },{
+               key: 'L3',
+               value: length3
+           },{
+               key: 'L4',
+               value: length4
+           },{
+               key: 'L5',
+               value: length5
+           },{
+               key: 'L6',
+               value: length6
+           }],
+           texts: {
+                title: '条码数据',
+                cancel: '取消'
+           },
+           styles: {
+                bg: '#FFF',
+                title: {
+                    textColor: '#000',
+                    textSize: 18,
+                    marginT: 10
+                },
+                topBorder: {
+                    borderColor: '#000',
+                    borderWidth: 2,
+                    marginT: 10
+                },
+                listHeight: 260,
+                item: {
+                    textColor: '#000',
+                    textSize: 14,
+                    marginL: 10,
+                    marginT: 5,
+                    marginB: 5,
+                    bgColor: '#FFF'
+                },
+                bottomBorder: {
+                    borderColor: '#000',
+                    borderWidth: 2,
+                },
+                cancel: {
+                    textSize: 18,
+                    textColor: '#f00',
+                    marginT: 10,
+                    highlight: '#696969'
+                }
+            }
+          },function(ret, err) {
+              if (ret) {
+                console.log(JSON.stringify(ret));
+                if(ret.eventType == 'cancel'){
+                  dialogBox.close({
+                    dialogName: 'receipt'
+                  });
+                }
+              } else {
+                  console.log(JSON.stringify(err));
+              }
+          });
 			}
 		});
 	}
@@ -472,21 +540,31 @@
 		});
 	}
  	function addscanner(){
- 	// 	var root = $api.getStorage('groupInfo');
-		// console.log("grinfo"+JSON.stringify(root));
-		// if(root == "true"){
-          scannerNum = window.prompt("请输入条码号：");
-          if(scannerNum != null){
-          	var now = new Date().Format("yyyy-MM-dd hh:mm:ss");
-            barscandate = JSON.stringify(now.toLocaleString());
-            var scanstatus = 'scanned';
-            console.log("scannerNum:"+scannerNum);
-            var groupId = group._id;
-            updateBarCodeInfo(scannerNum);//将插入改为更新
-          }
-		// }else{
-    //     	alert("对不起，你没有权限");
-    //     }
+    api.prompt({
+      title: '手动输入条码',
+      buttons: ['确认', '取消']
+    },function(ret, err){
+      if(err){
+        alert("错误");
+      }
+      var index = ret.buttonIndex;
+      var scannerNum = ret.text;
+      if(index == 1){
+        if(scannerNum){
+          var now = new Date().Format("yyyy-MM-dd hh:mm:ss");
+          barscandate = JSON.stringify(now.toLocaleString());
+          var scanstatus = 'scanned';
+          var groupId = group._id;
+          updateBarCodeInfo(scannerNum);
+        }
+        else{
+          alert("不能输入为空");
+        }
+      }
+      else{
+        return;
+      }
+    })
 	}
 	function Scanner(){
 		if(true){
@@ -879,6 +957,7 @@
 <script>
 	apiready = function(){
 		db = api.require('db');
+    dialogBox = api.require('dialogBox');
 		user = $api.getStorage(config.USER_KEY);
 		group = $api.getStorage(config.GROUP_KEY);
     console.log('serverIp'+config.ServerIp);
@@ -1018,11 +1097,20 @@
          });
     toast('操作成功!')
     }, function(errMsg){
-        toast('删除本地数据时出错,错误:'+errMsg)
+        toast('删除本地数据时出错,错误:'+errMsg);
+        api.closeFrame({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});api.closeFrame({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});
+        api.openFrame({
+            name: 'login',
+            url: './login.html',
+            reload:true
+           });
        })
   };
 
   var exit = function(){
+    if(!barUploadErrorQuee){
+      var barUploadErrorQuee=[];
+    }
     api.confirm({
       title:'提示',
       msg:'是否退出登录？'
@@ -1134,11 +1222,11 @@
 <div class="total-height">
 	<div class="inline1">
        <!--  <button onclick="javascript:window.location.href='sorttoday.html'">登&nbsp;&nbsp;&nbsp;录</button> -->
-        <button class="smallbtn button-left" onclick="selectProjname()">更新</button>
+        <button class="smallbtn button-left ui-btn ui-btn-inline ui-mini" onclick="selectProjname()">更新</button>
         <!-- <div class="centerout centerout-station" onclick="api.closeWin()" id="employeeStation"></div> -->
        <!--  <h2 class="centerout"><div class="centerout-station" onclick="api.closeWin()" id="employeeStation"></div>岗位</h2> -->
         <output class="centerout"><h2 id="employeeStation">岗位</h2></output>
-        <button class="smallbtn button-left" onclick="uploadData()">上传</button>
+        <button class="smallbtn button-left ui-btn ui-btn-inline ui-mini" onclick="uploadData()">上传</button>
         <div class="button-left">
           <label>备注</label>
           <input type="text" class="remark-text"  id="remark"/>
@@ -1150,87 +1238,85 @@
 
 	<div class="mainheight">
     	<div class="scanstyle">
-			<div class="tablew">
-				<div>
-		 		<table class="tablestyle">
-		 			<colgroup>
-		 				<col width="20%">
-						<col width="60%">
-						<col width="20%">
-					</colgroup>
-		 			<thead>
-		 				<tr>
-		 					<th>序号</th>
-		 					<th>条码</th>
-		 					<th>核对</th>
-		 				</tr>
-		 			</thead>
-		 		</table>
-		 		</div>
-				<div class="addScan-tbody">
-			    <table class="tablestyle">
-		 			<colgroup>
-	            		<col width="20%">
-	            		<col width="60%">
-	            		<col width="20%">
-	        		</colgroup>
-		 			<tbody  id="scannercontent">
-		 			</tbody>
-		 		</table>
-		 		</div>
+  			<div class="tablew">
+  				<div>
+    		 		<table class="tablestyle">
+    		 			<colgroup>
+    		 				<col width="20%">
+    						<col width="60%">
+    						<col width="20%">
+    					</colgroup>
+    		 			<thead>
+    		 				<tr>
+    		 					<th>序号</th>
+    		 					<th>条码</th>
+    		 					<th>核对</th>
+    		 				</tr>
+    		 			</thead>
+    		 		</table>
+  		 		</div>
+  				<div class="addScan-tbody">
+  			    <table class="tablestyle">
+  		 			    <colgroup>
+  	            		<col width="20%">
+  	            		<col width="60%">
+  	            		<col width="20%">
+  	        		</colgroup>
+      		 			<tbody  id="scannercontent">
+      		 			</tbody>
+  		 		  </table>
+  		 		</div>
 			</div>
 			<div class="btn">
-				<button class="scanbtn button-right" onclick="Scanner()">扫一扫</button>
-        <button class="scanbtn button-right" onclick="exit()">退出登录</button>
-				<button class="scanbtn button-left" onclick="addscanner()">条码添加</button>
+				<button class="scanbtn button-right ui-btn ui-btn-inline ui-mini" onclick="Scanner()">扫一扫</button>
+        <button class="scanbtn button-right ui-btn ui-btn-inline ui-mini" onclick="exit()">退出登录</button>
+				<button class="scanbtn button-left ui-btn ui-btn-inline ui-mini" onclick="addscanner()">条码添加</button>
 			</div>
 		</div>
     	<div class="employstyle">
     		<div class="tableww">
     			<div class="addEmploy">
-    			<div class="addEmploy-thead">
-    			<table class="tablestyle">
-    				<colgroup>
-		 				<col width="30%">
-						<col width="30%">
-						<col width="40%">
-					</colgroup>
-					<thead>
-						<tr>
-							<th colspan="3"><div style="position:relative;float:left;left:50%"><h4 style="position:relative;float:left;left:-50%">建组信息</h4></div>
-							<button style="float:right;" class="button button-primary button-box button-small createBtn" id="createBtn">
-   							<i class="fa fa-user-plus f"></i></button>
-   							<button style="float:right;" class="button button-primary button-box button-small deleteBtn" id="deleteBtn">
-   							<i class="fa fa-trash-o " ></i></button>
-							</th>
-						</tr>
-						<!--<tr>
-         					<th>姓名</th>
-         					<th>员工号</th>
-         					<th>手机号</th>
-         				</tr>-->
-					</thead>
-				</table>
-    			</div>
-    		<div class="addEmploy-tbody">
-    			<table class="tablestyle">
-    				<colgroup>
-	            		<col width="30%">
-	            		<col width="30%">
-	            		<col width="40%">
-	        		</colgroup>
-	     			<tbody id="employeecontent">
-       				</tbody>
-      			 </table>
-				</div>
-       		  </div>
+      			<div class="addEmploy-thead">
+        			<table class="tablestyle">
+        				<colgroup>
+      		 				<col width="30%">
+      						<col width="30%">
+      						<col width="40%">
+    					  </colgroup>
+      					<thead>
+      						<tr>
+      							<th colspan="3"><div style="position:relative;float:left;left:50%"><h4 style="position:relative;float:left;left:-50%">建组信息</h4></div>
+      							  <button style="float:right;" class="button button-primary button-box button-small createBtn ui-btn ui-btn-inline ui-mini" id="createBtn">
+         							<i class="fa fa-plus"></i></button>
+         							<button style="float:right;" class="button button-primary button-box button-small deleteBtn ui-btn ui-btn-inline ui-mini" id="deleteBtn">
+         							<i class="fa fa-trash-o"></i></button>
+      							</th>
+      						</tr>
+      						<!--<tr>
+               					<th>姓名</th>
+               					<th>员工号</th>
+               					<th>手机号</th>
+               				</tr>-->
+      					</thead>
+    				  </table>
+      			</div>
+        		<div class="addEmploy-tbody">
+        			<table class="tablestyle">
+        				<colgroup>
+  	            		<col width="30%">
+  	            		<col width="30%">
+  	            		<col width="40%">
+    	        	</colgroup>
+    	     			<tbody id="employeecontent">
+           			</tbody>
+          		</table>
+    				</div>
+       	</div>
 			</div>
-        	<div class="history-btn">
-    			<button  onclick="getInfo()">历史查询</button>
-     <!-- <button onclick="removegroup()">撤销</button>
-      <button onclick="creategroup()">创建</button> -->
-    			</div>
-			</div>
+      <div class="history-btn">
+    			<button class="ui-btn ui-btn-inline ui-mini" onclick="getInfo()">历史查询</button>
+    	</div>
+		</div>
 	</div>
 </div>
 </body>

@@ -8,7 +8,7 @@
 		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
 		<link rel="stylesheet" type="text/css" href="../css/buttons.css">
 		<link rel="stylesheet" type="text/css" href="../css/jquery-ui.css">
-		<link rel="stylesheet"  href="../css/font-awesome.min.css">
+		<link href="http://cdn.bootcss.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 		<script type="text/JavaScript" src="../js/jquery-3.1.0.min.js"></script>
 		<script type="text/javascript" src="../script/api.js"></script>
 		<script type="text/JavaScript" src="../js/jquery-ui.js"></script>
@@ -77,7 +77,7 @@
 						html += '<tr><td>总计:' + total + '条</td><td>' + sum + '元</td></tr>'
 						$("#tbody-scanner").html(html);
 					} else {
-						alert("查询失败");
+						alert("查询失败:" + ret.retError);
 					}
 				});
 			}
@@ -100,7 +100,7 @@
 					<h1>查询历史条码信息</h1>
 				</div>
 				<div class="header-left">
-					<i class="fa fa-sign-out fa-2x"></i>
+
 				</div>
 			</div>
 			<div class="history-show">

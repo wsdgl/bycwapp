@@ -62,6 +62,9 @@
 <script type="text/javascript">
 	apiready = function(){
     erplogin('superAdmin','111111','saas');
+    api.setStatusBarStyle({
+        style: 'light'
+    });
 		var user = $api.getStorage(config.USER_KEY);
 		console.log("user"+JSON.stringify(user));
 	    if(user){
@@ -69,28 +72,20 @@
 	    	console.log("user.workid"+JSON.stringify(user.workId));
 	    	console.log("user.password"+JSON.stringify(user.password))
 	    	login(user.workId, user.password, function(user){
-
 	    		$api.setStorage(config.USER_KEY,user);
-
-//	    		api.execScript({
-//		         	name:'scanner',
-//	 	            script: jsfun
-//		        });
-//
-				api.openWin({
-					name: 'scanner',
+				  api.openWin({
+					    name: 'scanner',
 	 	      		url: './html/scanner.html',
-	 	        	reload:true
+	 	        	reload:true,
+              slidBackEnabled: false
 	           });
 	    	}, function(err){
-
 	    		toast("自动登录失败!错误:" + err);
-
-				api.openWin({
-					name: 'login',
-					url: './html/login.html',
-          slidBackEnabled: false
-				 });
+  				api.openWin({
+  					name: 'login',
+  					url: './html/login.html',
+            slidBackEnabled: false
+  				 });
 	    	});
 
 	    }else{
