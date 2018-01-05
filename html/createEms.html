@@ -82,6 +82,9 @@
 	                    script: 'updateGroup(renderGroup)'
                     });
         		}
+						else{
+							toast('建组失败！错误:'+ret.retError);
+						}
         	}
         	api.closeFrame({})
         })
