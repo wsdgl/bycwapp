@@ -915,7 +915,7 @@
 
 	  function getInfo(){
 	  	var headerH = 0;
-		var footerH = 0;
+		  var footerH = 0;
 	    var frameH = api.winHeight - headerH - footerH;
 	  	api.openFrame({
             name: 'getInfo',
@@ -930,6 +930,83 @@
         });
 	  }
 
+    function changePass(){
+        dialogBox.list({
+          texts:{
+            title: '密码修改',
+            enter: '确定',
+          },
+          listTitles: ['原密码：', '新密码：'],
+          tapClose: true,
+          styles: {
+              bg: '#fff',
+              corner: 0,
+              w: 300,
+              h: 260,
+              title: {
+                  h: 44,
+                  size: 14,
+                  color: '#000'
+              },
+              list: {
+                  h: 128,
+                  row: 2,
+                  title: {
+                      marginL: 10,
+                      size: 14,
+                      color: '#696969'
+                  },
+                  content: {
+                      marginL: 10,
+                      size: 14,
+                      color: '#000'
+                  }
+              },
+              dividingLine: {
+                  width: 0.5,
+                  color: '#696969'
+              },
+              enter: {
+                  w: 80,
+                  h: 40,
+                  bg: '#1874CD',
+                  color: '#ffffff',
+                  size: 12
+              }
+          }
+        }, function(ret){
+          if (ret.eventType == 'enter') {
+              var prePass = ret.amounts[0];
+              var newPass = ret.amounts[1];
+              if(!prePass){
+                alert('原密码不能为空');
+              }
+              if(!newPass){
+                alert('新密码不能为空')
+              }
+              data={
+                prePass: prePass,
+                newPass: newPass
+              }
+              if(prePass && newPass){
+                post(url.changePass, data, function(ret, err){
+                  if(err){
+                    alert('密码修改请求出错'+ err.msg);
+                  }
+                  if(ret.status == "OK"){
+                    alert('修改成功');
+                    api.closeFrame({
+                        name:'changePass'
+                    });
+                  }
+                  else{
+                    alert('修改失败'+ret.retError);
+                  }
+                })
+              }
+          }
+        })
+    }
 
 	Date.prototype.Format = function(fmt)
         { //author: meizz
@@ -1311,6 +1388,7 @@
        	</div>
 			</div>
       <div class="history-btn">
+          <button class="ui-btn ui-btn-inline ui-mini" onclick="changePass()">修改密码</button>
     			<button class="ui-btn ui-btn-inline ui-mini" onclick="getInfo()">历史查询</button>
     	</div>
 		</div>

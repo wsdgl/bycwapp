@@ -18,7 +18,8 @@ var url={
 	erplogin: config.ServerIp+'/users/login',
 	getCurrentOrders: config.ServerIp+'/aluveneerOrders/getCurrentOrders',
 	getCurrentGoodsOut: config.ServerIp+'/goodsOutNotes/getCurrentGoodsOutNote',
-	getGoodsOutBarCode: config.ServerIp+'/barCode/getGoodsOutBarList'
+	getGoodsOutBarCode: config.ServerIp+'/barCode/getGoodsOutBarList',
+	changePass: config.ServerIp+ '/employees/changePass',
 };
 var config={
 	USER_KEY:'userInfo',
