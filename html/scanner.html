@@ -300,7 +300,7 @@
 
     }
     function uploadBarinfo(cb){
-      var remark = $("#remark").val()
+      var remark = $("#remark").val() || '';
       var sql1 = 'update Barcodetest set remark ='+remark+' where status = 1';
       var sql2 = 'select * from Barcodetest where status = 1';
       executeSql(db, sql1, function(){
@@ -603,7 +603,7 @@
 		            						  barId:barId,
 		            						  barScanDate:new Date().getTime(),
 		            						  groupId:group._id,
-                              remark:$('#remark').val()
+                              remark:$('#remark').val() || ''
 	            					  }
 	            						renderBarinfos()
 	            						uploadBar(bar)
@@ -674,14 +674,14 @@
 	function updateBarCodeInfo(barid){
 		//var db = api.require('db');
     var ssql = 'select * from Barcodetest  WHERE barId LIKE \'%'+barid+'%\''
-    console.log(ssql);
+
     selectSql(db, ssql, function(data){
         if(data.length==0){
           toast('该条码在本地不存在!')
         }else{
           console.log(JSON.stringify(data));
-          if(data[0].status==0){
-              if(data.length == 1){
+          if(data.length == 1){
+              if(data[0].status==0){
                   var barId = data[0].barId;
                   var sql = 'update Barcodetest set status = 1,barScanDate=\''+new Date().getTime()+'\' where barId = \''+barId+'\''
                   executeSql(db, sql, function(){
@@ -689,7 +689,7 @@
                         barId:barId,
                         barScanDate:new Date().getTime(),
                         groupId:group._id,
-                        remark:$('#remark').val()
+                        remark:$('#remark').val() || ''
                     }
                     renderBarinfos()
                     uploadBar(bar)
@@ -698,10 +698,10 @@
                 })
               }
               else{
-                toast('检查到有多条条码匹配，请重新输入完整条码')
+                toast('该条码已经扫过了！重复扫描无效!')
               }
           }else{
-            toast('该条码已经扫过了！重复扫描无效!')
+            toast('检查到有多条条码匹配，请重新输入完整条码')
           }
       }
     })
@@ -981,10 +981,11 @@
               if(!prePass){
                 alert('原密码不能为空');
               }
-              if(!newPass){
-                alert('新密码不能为空')
+              else if(!newPass){
+                alert('新密码不能为空');
               }
               data={
+                employee: user._id,
                 prePass: prePass,
                 newPass: newPass
               }
@@ -993,14 +994,14 @@
                   if(err){
                     alert('密码修改请求出错'+ err.msg);
                   }
-                  if(ret.status == "OK"){
-                    alert('修改成功');
-                    api.closeFrame({
+                  if(ret.retStatus == "OK"){
+                    dialogBox.close({
                         name:'changePass'
                     });
+                    alert('修改成功');
                   }
                   else{
-                    alert('修改失败'+ret.retError);
+                    alert('修改失败:'+ret.retError);
                   }
                 })
               }

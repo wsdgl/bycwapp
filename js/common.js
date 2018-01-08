@@ -40,7 +40,7 @@ function login(workid,password,cb,errcb){
 			}
 		}else{
 			if(errcb){
-				errcb(JSON.stringify(ret));
+				errcb(ret);
 			}
 		}
 	});
