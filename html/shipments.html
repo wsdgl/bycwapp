@@ -51,14 +51,11 @@
 			name: name
 		}
 		data = JSON.stringify(data);
-		console.log('data'+data);
 		api.execScript({
 			frameName:"scanner",
 				script: 'updateData('+data+')'
 		});
-		api.closeFrame({
-				name:'shipments'
-		});
+		console.log('data'+data);
 	}
 	</script>
 </head>

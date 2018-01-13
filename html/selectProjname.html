@@ -79,14 +79,13 @@
 			selectProj.push(proj);
 		});
 		selectProj = JSON.stringify(selectProj);
-		console.log('selectProj'+selectProj);
+
 		api.execScript({
 				frameName:'scanner',
 				script: 'updateData('+selectProj+')'
 		});
-		api.closeFrame({
-				name:'selectProjname'
-		});
+		console.log('selectProj'+selectProj);
+
 	}
 	</script>
 </head>

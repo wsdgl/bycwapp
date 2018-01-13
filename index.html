@@ -61,7 +61,7 @@
 <script type="text/JavaScript" src="./js/common.js"></script>
 <script type="text/javascript">
 	apiready = function(){
-    erplogin('superAdmin','111111','saas');
+    erplogin('superAdmin','111111','CRM');
     api.setStatusBarStyle({
         style: 'light'
     });
@@ -73,7 +73,7 @@
 	    	console.log("user.password"+JSON.stringify(user.password))
 	    	login(user.workId, user.password, function(user){
 	    		$api.setStorage(config.USER_KEY,user);
-				  api.openWin({
+				  api.openFrame({
 					    name: 'scanner',
 	 	      		url: './html/scanner.html',
 	 	        	reload:true,

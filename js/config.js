@@ -29,6 +29,7 @@ var config={
 	TABLE_BARCODE : 'CREATE TABLE IF NOT EXISTS Barcodetest (_id varchar(32), barId varchar(16), barScanDate varchar(32), projName varchar(256), status int default(0),groupId varchar(32),remark varchar(20),PRIMARY KEY(_id))',
 	SHIPMENTS: '发货',
 	IP: 'ipAddress',
+	PASSWORD_KEY: 'person',
 //	TABLE_GROUP : 'CREATE TABLE IF NOT EXISTS Workgroup (workname varchar(255),tel varchar(255),workid varchar(255),PRIMARY KEY(workid))'
 }
 var pages={

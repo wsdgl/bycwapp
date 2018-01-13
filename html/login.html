@@ -18,17 +18,30 @@
     	}
     </style>
 	<script>
-
- 		function login2(){
- 			api.openWin({
- 	            name: 'scanner',
- 	            url: 'scanner.html'
-           });
- 		}
 	apiready = function(){
+    api.closeFrame({
+      name:'scanner',
+      // url:'../html/scanner.html',
+      // animation:{type: 'none'}
+    });
     api.setStatusBarStyle({
         style: 'light'
     });
+
+    if($api.getStorage(config.PASSWORD_KEY)){
+      var person=$api.getStorage(config.PASSWORD_KEY);
+      var workid=person.workid;
+      var password=person.password;
+      $("#workid").val(workid);
+      $("#password").val(password);
+      console.log("执行了呀");
+    }else{
+      //我这边将它强制定性为空，能否实现我们的功能，待测试，目前没能成功
+      $("#workid").val('');
+      $("#password").val('');
+
+      console.log("我没任何值");
+    }
     $("#ipAddress").click(function(){
       var headerH = 0;
       var footerH = 0;
@@ -50,7 +63,7 @@
 
  		$("#login").click(function(){
       console.log($api.getStorage(config.IP));
-      erplogin('superAdmin','111111','saas');
+      erplogin('superAdmin','111111','CRM');
 			var workid = $("#workid").val();
 			var password = $("#password").val();
 //			var userdata = {
@@ -60,17 +73,24 @@
 //			};
 //
 			login(workid, password, function(user){
-
+        var person={};
+        person.workid=workid;
+        person.password=password;
+        $api.setStorage(config.PASSWORD_KEY, person);
+        if($("input[type='checkbox']").is(':checked')==false){
+          $api.rmStorage(config.PASSWORD_KEY);
+        }
+        console.log(JSON.stringify($api.getStorage(config.PASSWORD_KEY)));
 				$api.setStorage(config.USER_KEY,user);
         api.closeFrame({
-                name:'login',
-                url:'../html/login.html',
-                animation:{type: 'none'}
-                });
+              name:'login',
+              url:'../html/login.html',
+              animation:{type: 'none'}
+        });
 				api.openFrame({name:'scanner', url:'../html/scanner.html',reload:true});
 
 			}, function(err){
-        
+
 				alert("登陆失败!错误："+err.retError);
 
 			})
@@ -99,6 +119,10 @@
         <div class="btn">
             <button class="button" id="login">登&nbsp;&nbsp;&nbsp;录</button>
         </div>
+        <div class="chioce">
+             <input class='checkbox' type='checkbox' checked/>
+             <label>记住密码</label>
+        <div>
         <div class="btn">
             <button class="button" id="ipAddress">修改IP地址</button>
         </div>

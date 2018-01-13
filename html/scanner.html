@@ -174,6 +174,7 @@
       if(user.station == config.SHIPMENTS){
         durl = url.getGoodsOutBarCode + '/' +group._id
       }
+      console.log('durl',durl);
       var data = {data: selectProj};
     	post(durl, data, function(ret, err){
     		if(err){
@@ -291,6 +292,12 @@
     	})
     }
     function updateData(selectProj){
+      api.closeFrame({
+          name:'selectProjname'
+      });
+      api.closeFrame({
+          name:'shipments'
+      });
     	updateGroup(function(){
     		renderGroup()
     		updateBarinfo(selectProj, function(){
@@ -301,7 +308,8 @@
     }
     function uploadBarinfo(cb){
       var remark = $("#remark").val() || '';
-      var sql1 = 'update Barcodetest set remark ='+remark+' where status = 1';
+      var sql1 = 'update Barcodetest set remark ="'+ remark +'" where status = 1';
+      console.log(sql1);
       var sql2 = 'select * from Barcodetest where status = 1';
       executeSql(db, sql1, function(){
           selectSql(db, sql2, function(data){
@@ -649,7 +657,7 @@
 						toast('上传数据成功！写入本地失败!错误:'+errMsg)
 					})
 				}else{
-					toast('上传失败!')
+					toast('上传失败!'+ ret.retError)
 				}
 			}
 		})
@@ -996,7 +1004,7 @@
                   }
                   if(ret.retStatus == "OK"){
                     dialogBox.close({
-                        name:'changePass'
+                        dialogName:'list'
                     });
                     alert('修改成功');
                   }
@@ -1155,26 +1163,22 @@
     executeSql(db, sql, function(){
       $api.rmStorage(config.USER_KEY);
       $api.rmStorage(config.GROUP_KEY);
-      api.closeFrame({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});
-      console.log($api.getStorage(config.USER_KEY));
-      console.log($api.getStorage(config.GROUP_KEY));
-      api.openFrame({
+      // api.closeFrame({
+      //   name:'scanner',
+      //   // url:'../html/scanner.html',
+      //   // animation:{type: 'none'}
+      // });
+      console.log('退出成功')
+      api.openWin({
           name: 'login',
           url: './login.html',
+          delay: 500,
           reload:true
-          // bounces: false,
-          // bgColor:'#ffffff',
-          // rect: {
-          //     x:0,
-          //     y:0,
-          //     w:'auto',
-          //     h:'auto'  }
-         });
-    toast('操作成功!')
+      });
+      toast('操作成功!')
     }, function(errMsg){
         toast('删除本地数据时出错,错误:'+errMsg);
-        api.closeFrame({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});api.closeFrame({name:'scanner', url:'../html/scanner.html', animation:{type: 'none'}});
-        api.openFrame({
+        api.openWin({
             name: 'login',
             url: './login.html',
             reload:true
@@ -1202,6 +1206,9 @@
           },function(ret,err){
               if(ret.buttonIndex == 1){
                 doExit();
+              }
+              else{
+                toast('取消退出!')
               }
           });
         }
