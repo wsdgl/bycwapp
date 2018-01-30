@@ -27,6 +27,24 @@
     api.setStatusBarStyle({
         style: 'light'
     });
+    var current = 0;
+    api.addEventListener({
+            name : 'keyback'
+    }, function(ret, err) {
+            if ((new Date().getTime() - current) > 2000) {
+                    current = new Date().getTime();
+                    api.toast({msg:'再按一次退出' + api.appName});
+            } else {
+                    api.closeWidget({
+                            id : api.appId,
+                            silent : true,
+                            animation : {
+                                    type : 'fade',
+                                    duration : 150
+                            }
+                    });
+            }
+    });
 
     if($api.getStorage(config.PASSWORD_KEY)){
       var person=$api.getStorage(config.PASSWORD_KEY);
@@ -78,12 +96,14 @@
         }
         console.log(JSON.stringify($api.getStorage(config.PASSWORD_KEY)));
 				$api.setStorage(config.USER_KEY,user);
-        api.closeWin({
-              name:'login',
-              url:'../html/login.html',
-              animation:{type: 'none'}
+
+        api.openWin({
+          name:'scanner',
+          url:'../html/scanner.html',
+          reload:true,
+          slidBackEnabled: false
         });
-				api.openWin({name:'scanner', url:'../html/scanner.html',reload:true});
+
 
 			}, function(err){
 

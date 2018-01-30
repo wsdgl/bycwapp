@@ -309,7 +309,6 @@
     function uploadBarinfo(cb){
       var remark = $("#remark").val() || '';
       var sql1 = 'update Barcodetest set remark ="'+ remark +'" where status = 1';
-      console.log(sql1);
       var sql2 = 'select * from Barcodetest where status = 1';
       executeSql(db, sql1, function(){
           selectSql(db, sql2, function(data){
@@ -642,7 +641,8 @@
 		}
 		post(url.uploadbarcode, data, function(ret,err){
 			if(err){
-				toast('上传失败!错误:'+err.msg)
+				toast('上传失败!错误:'+err.msg);
+        barUploadErrorQuee.push(data);
 			}else{
 				if(ret.retStatus == 'OK'){
 					var sql = ''
@@ -658,6 +658,7 @@
 					})
 				}else{
 					toast('上传失败!'+ ret.retError)
+          barUploadErrorQuee.push(data);
 				}
 			}
 		})
@@ -925,7 +926,7 @@
 	  	var headerH = 0;
 		  var footerH = 0;
 	    var frameH = api.winHeight - headerH - footerH;
-	  	api.openFrame({
+	  	api.openWin ({
             name: 'getInfo',
             url: './getInfo.html',
             bounces: false,
@@ -1039,6 +1040,11 @@
 
 <script>
 	apiready = function(){
+    api.closeWin({
+          name:'login',
+          url:'../html/login.html',
+          animation:{type: 'none'}
+    });
 		db = api.require('db');
     dialogBox = api.require('dialogBox');
 		user = $api.getStorage(config.USER_KEY);
@@ -1173,7 +1179,8 @@
           name: 'login',
           url: './login.html',
           delay: 500,
-          reload:true
+          reload:true,
+          slidBackEnabled: false
       });
       toast('操作成功!')
     }, function(errMsg){
@@ -1181,7 +1188,8 @@
         api.openWin({
             name: 'login',
             url: './login.html',
-            reload:true
+            reload:true,
+            slidBackEnabled: false
            });
        })
   };

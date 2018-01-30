@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width">
+		<meta name="format-detection" content="telephone=no" />
 		<title>历史查询</title>
 		<link rel="stylesheet" type="text/css" href="../css/getInfo.css">
 		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
@@ -58,15 +59,15 @@
 					enddate : enddate,
 					workid : user._id
 				}
-				console.log("data"+JSON.stringify(data));
+
 				post(url.history, data, function(ret, err) {
 					if (ret.retStatus == 'OK') {
 						var barhistory = ret.retValue;
-						console.log("barhistory"+JSON.stringify(barhistory));
+
 						var sum = 0;
 						var total = 0;
 						var html = ''
-						console.log("length"+barhistory.length)
+
 						for (var i = 0; i < barhistory.length; i++) {
 
 							var price = barhistory[i].price
@@ -83,7 +84,7 @@
 			}
 
 			function closeGetInfo(){
-				api.closeFrame({
+				api.closeWin({
 				    name: 'getInfo'
 				});
 
