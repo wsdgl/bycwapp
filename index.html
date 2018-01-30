@@ -73,7 +73,7 @@
 	    	console.log("user.password"+JSON.stringify(user.password))
 	    	login(user.workId, user.password, function(user){
 	    		$api.setStorage(config.USER_KEY,user);
-				  api.openFrame({
+				  api.openWin({
 					    name: 'scanner',
 	 	      		url: './html/scanner.html',
 	 	        	reload:true,

@@ -52,7 +52,7 @@
 		}
 		data = JSON.stringify(data);
 		api.execScript({
-			frameName:"scanner",
+			  name:"scanner",
 				script: 'updateData('+data+')'
 		});
 		console.log('data'+data);

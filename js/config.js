@@ -17,7 +17,7 @@ var url={
 	clearbar:config.ServerIp+'/barCode/deleteBarScanInfoOnSvr',
 	erplogin: config.ServerIp+'/users/login',
 	getCurrentOrders: config.ServerIp+'/aluveneerOrders/getCurrentOrders',
-	getCurrentGoodsOut: config.ServerIp+'/goodsOutNotes/getCurrentGoodsOutNote',
+	getCurrentGoodsOut: config.ServerIp+'/shippingPlan/getCurrentGoodsOutNote',
 	getGoodsOutBarCode: config.ServerIp+'/barCode/getGoodsOutBarList',
 	changePass: config.ServerIp+ '/employees/changePass',
 };

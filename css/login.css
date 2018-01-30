@@ -34,7 +34,7 @@ html,body {
     margin-top: 11%;
 }
 
-.admin,.password {
+.admin,.password{
     width: 65%;
     margin: 0 auto;
     margin-top: 7%;
@@ -64,4 +64,16 @@ span {
     border: none;
     border-radius: 5px;
     font-family: "Microsoft Yahei",sans-serif;
+}
+
+.choice input {
+  zoom: 80%;
+  width: 20%;
+}
+
+.choice {
+  width: 40%;
+  margin: 0 auto;
+  margin-top: 7%;
+  margin-right: 10%;
 }

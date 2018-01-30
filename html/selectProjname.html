@@ -81,7 +81,7 @@
 		selectProj = JSON.stringify(selectProj);
 
 		api.execScript({
-				frameName:'scanner',
+				name:'scanner',
 				script: 'updateData('+selectProj+')'
 		});
 		console.log('selectProj'+selectProj);

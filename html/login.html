@@ -19,10 +19,10 @@
     </style>
 	<script>
 	apiready = function(){
-    api.closeFrame({
+    api.closeWin({
       name:'scanner',
-      // url:'../html/scanner.html',
-      // animation:{type: 'none'}
+      url:'../html/scanner.html',
+      animation:{type: 'none'}
     });
     api.setStatusBarStyle({
         style: 'light'
@@ -34,13 +34,9 @@
       var password=person.password;
       $("#workid").val(workid);
       $("#password").val(password);
-      console.log("执行了呀");
     }else{
-      //我这边将它强制定性为空，能否实现我们的功能，待测试，目前没能成功
       $("#workid").val('');
       $("#password").val('');
-
-      console.log("我没任何值");
     }
     $("#ipAddress").click(function(){
       var headerH = 0;
@@ -82,12 +78,12 @@
         }
         console.log(JSON.stringify($api.getStorage(config.PASSWORD_KEY)));
 				$api.setStorage(config.USER_KEY,user);
-        api.closeFrame({
+        api.closeWin({
               name:'login',
               url:'../html/login.html',
               animation:{type: 'none'}
         });
-				api.openFrame({name:'scanner', url:'../html/scanner.html',reload:true});
+				api.openWin({name:'scanner', url:'../html/scanner.html',reload:true});
 
 			}, function(err){
 
@@ -116,13 +112,13 @@
             <span>密&nbsp;&nbsp;&nbsp;码</span>
             <input type="password" id="password" placeholder="请输入密码"/>
         </div>
+        <div class="choice">
+             <input class='checkbox' type='checkbox' checked/>
+             <label>记住密码</label>
+        </div>
         <div class="btn">
             <button class="button" id="login">登&nbsp;&nbsp;&nbsp;录</button>
         </div>
-        <div class="chioce">
-             <input class='checkbox' type='checkbox' checked/>
-             <label>记住密码</label>
-        <div>
         <div class="btn">
             <button class="button" id="ipAddress">修改IP地址</button>
         </div>
