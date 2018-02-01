@@ -643,6 +643,7 @@
 			if(err){
 				toast('上传失败!错误:'+err.msg);
         barUploadErrorQuee.push(data);
+        console.log('错误数组1'+barUploadErrorQuee);
 			}else{
 				if(ret.retStatus == 'OK'){
 					var sql = ''
@@ -659,6 +660,7 @@
 				}else{
 					toast('上传失败!'+ ret.retError)
           barUploadErrorQuee.push(data);
+          console.log('错误数组2'+barUploadErrorQuee);
 				}
 			}
 		})
@@ -1110,9 +1112,9 @@
 		        	bgColor:'#ffffff',
 		        	rect: {
 		          	 	x:0,
-						y:frameY,
-					 	w:'auto',
-				     	h:frameH  }
+						      y:frameY,
+					 	      w:'auto',
+				     	    h:frameH  }
 		    	});
 			}
 		})
@@ -1139,7 +1141,7 @@
 	var deleteGroup = function(){
     api.confirm({
       title:'提示',
-      msg:'是否撤销小组？'
+      msg:'撤销小组会删除未上传条码，是否撤销小组？'
     },function(ret,err){
       if(ret.buttonIndex == 2){
     		uploadBarinfo(function(){
@@ -1200,7 +1202,7 @@
     }
     api.confirm({
       title:'提示',
-      msg:'是否退出登录？'
+      msg:'退出登录会删除未上传条码，是否退出登录？'
     },function(ret,err){
       if(ret.buttonIndex == 2){
         if(barUploadErrorQuee.length == 0){
