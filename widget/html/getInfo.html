@@ -73,9 +73,9 @@
 							var price = barhistory[i].price
 							sum += price;
 							total++
-							html += '<tr><td>' + barhistory[i].barId + '</td><td>' + barhistory[i].price + '</td></tr>'
+							html += '<tr><td>' + barhistory[i].barId + '</td>'+ '<td>' + barhistory[i].workCentre + '</td>' +'<td>' + barhistory[i].price + '</td></tr>'
 						}
-						html += '<tr><td>总计:' + total + '条</td><td>' + sum + '元</td></tr>'
+						html += '<tr><td>总计:' + total + '条</td>'+ '<td></td>' +'<td>' + sum + '元</td></tr>'
 						$("#tbody-scanner").html(html);
 					} else {
 						alert("查询失败:" + ret.retError);
@@ -118,6 +118,7 @@
 						<thead>
 							<tr>
 								<td>条码信息</td>
+								<td>工序</td>
 								<td>价格</td>
 							</tr>
 						</thead>

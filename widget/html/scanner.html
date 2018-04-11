@@ -583,6 +583,7 @@
             	}else{
             		if(ret.eventType=="success"){
             			barId = ret.content;
+                  barId = barId.substr(1,barId.length);
             			var ssql = 'select * from Barcodetest where barId = \''+barId+'\''
             			selectSql(db, ssql, function(data){
             				if(data.length==0){

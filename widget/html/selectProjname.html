@@ -37,8 +37,8 @@
 			// for(var i=0; i<$("#select_orders .selectproj").length; i++){
 			// 	$("#select_orders .selectproj")[i].click = checked();
 			// }
-
-			get(url.getCurrentOrders, function(ret, err){
+			var user = $api.getStorage(config.USER_KEY);
+			get(url.getCurrentOrders+'/' + user.workCentreType, function(ret, err){
 				if(err){
 					toast('获取订单失败'+err.msg);
 				}

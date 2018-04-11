@@ -19,7 +19,7 @@ h4 {
 .select {
   width: 100%;
   height: 65%;
-  overflow: hidden;
+  overflow: auto;
 }
 .clearfix {
   height:1px;

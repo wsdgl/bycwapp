@@ -36,7 +36,7 @@
 						console.log('返回'+ret.retValue[0].name);
 						for(var i=0; i<ret.retValue.length; i++){
 								$('#select_plan').append("<div><input type='radio' name='plan' data-name=" + ret.retValue[i].name + " class='selectproj' /> "+
-								"<output class='projname'>"+ret.retValue[i].name + ' ' + "</output>");
+								"<output class='projname'>"+ret.retValue[i].name + ' ' + ret.retValue[i].timeId+ "</output>");
 						}
 					}
 					else{
