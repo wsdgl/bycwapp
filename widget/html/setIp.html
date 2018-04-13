@@ -21,7 +21,7 @@
 			var H = api.winHeight
 			$('body').css('height', H/2);
       $('#ipAddress').val($api.getStorage(config.IP));
-      console.log($api.getStorage(config.IP))
+			$('#port').val($api.getStorage(config.PORT));
 			$("#cancel").click(function(){
 				api.closeFrame({
 	          name:'setIp'
@@ -31,7 +31,9 @@
 	};
   function changeIp(){
     var ipAddress = $('#ipAddress').val();
+		var port = $('#port').val();
     $api.setStorage(config.IP, ipAddress);
+		$api.setStorage(config.PORT, port);
     api.closeFrame({
         name:'setIp'
     });
@@ -51,6 +53,10 @@
 		<div>
 		  <span>IP地址</span>
       <input id="ipAddress" type="text"/>
+		</div>
+		<div>
+		  <span>端口号</span>
+      <input id="port" type="text"/>
 		</div>
 		<div class="clearfix"></div>
 		<div class="bottom-btn">

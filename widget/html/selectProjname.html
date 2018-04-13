@@ -44,9 +44,8 @@
 				}
 				else{
 					if(ret.retStatus == 'OK'){
-						console.log('sss'+ret.retValue);
 						for(var i=0; i<ret.retValue.length; i++){
-								$('#select_orders').append("<div><input type='checkbox' data-name=" + ret.retValue[i].projectName.name + " data-id="+ret.retValue[i].cgdh+" class='selectproj' /> "+
+								$('#select_orders').append("<div><input type='checkbox' data-gcmcid="+ ret.retValue[i].projectName._id +" data-name=" + ret.retValue[i].projectName.name + " data-id="+ret.retValue[i].cgdh+" class='selectproj' /> "+
 								"<output class='projname'>"+ret.retValue[i].projectName.name + ' ' + "</output>"+
 								"<output class='cgdh'>"+ ret.retValue[i].cgdh +"</output></div>");
 						}
@@ -76,6 +75,7 @@
 			var proj = {};
 			proj.projectName = $(this).attr('data-name');
 			proj.cgdh = $(this).attr('data-id');
+			proj.projectId = $(this).attr('data-gcmcid');
 			selectProj.push(proj);
 		});
 		selectProj = JSON.stringify(selectProj);

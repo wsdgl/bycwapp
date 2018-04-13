@@ -2,7 +2,7 @@
 var config={
 	//ServerIp:'http://192.168.6.104:8089'
 	//ServerIp:'http://192.168.125.118:8089'
-	ServerIp:'http://'+$api.getStorage('ipAddress')+':8089'
+	ServerIp:'http://'+$api.getStorage('ipAddress')+':'+$api.getStorage('port')
 }
 
 var url={
@@ -29,6 +29,7 @@ var config={
 	TABLE_BARCODE : 'CREATE TABLE IF NOT EXISTS Barcodetest (_id varchar(32), barId varchar(16), barScanDate varchar(32), projName varchar(256), status int default(0),groupId varchar(32),remark varchar(20),PRIMARY KEY(_id))',
 	SHIPMENTS: '发货',
 	IP: 'ipAddress',
+	PORT: 'port',
 	PASSWORD_KEY: 'person',
 //	TABLE_GROUP : 'CREATE TABLE IF NOT EXISTS Workgroup (workname varchar(255),tel varchar(255),workid varchar(255),PRIMARY KEY(workid))'
 }

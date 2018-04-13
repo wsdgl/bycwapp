@@ -221,6 +221,7 @@
     	}else{
     		var bar = barUploadQuee[num]
     		bar.groupId = group._id
+        bar.employeeId = user._id
     		console.log("手动上传"+JSON.stringify(bar));
     		post(url.uploadbarcode, bar, function(ret,err){
     			if(err){
@@ -332,38 +333,10 @@
 
 
     }
-//	function uploadBarCode(){
-//		//selectcontent();
-//		var root = $api.getStorage('groupInfo');
-//		console.log("grinfo"+JSON.stringify(root));
-//		if(root == "true"){
-//			var barCodeInfo = $api.getStorage('updateBarInfo');
-// 			var sannedInfo = {
-// 				barinfoarray:JSON.stringify(barCodeInfo)
-// 			}
-//			console.log("sannedInfo"+JSON.stringify(barCodeInfo));
-//			post(url.uploadbarcode,sannedInfo,function(ret,err){
-//		  		console.log("sannedInfoaaaaaaaa"+JSON.stringify(sannedInfo));
-//				if(ret.retStatus == 'OK'){
-//					alert("条码上传成功");
-//					console.log("条码上传成功："+JSON.stringify(ret));
-//				}else{
-//					if(ret.retStatus=='Fail'){
-//					alert("没有新扫的条码可以上传");
-//					}else{
-//					console.log("条码上传失败"+JSON.stringify(err));
-// 	     			alert("条码上传失败");
-//					}
-//				}
-//			});
-//		}else{
-//			alert("对不起，你没有权限");
-//		}
-//	}
-//
+
 
 	function barInfo(barid){
-		//var barid = $(event.target).parent().find('.scanname').text();
+
 		get(url.barinfo+'/'+barid,function(ret,err){
 			if(ret.retStatus == 'OK'){
 				var barinfos = ret.retValue.projName
@@ -382,8 +355,6 @@
 				var length4 = barinfos.L4
 				var length5 = barinfos.L5
 				var length6 = barinfos.L6
-				//console.log("aluminumNo"+ aluminumNo+projectName );
-				//console.log("alumminumName"+alumminumName +singleArea+ isAbnormity+colorNo+figureNo+width+length1+length2+length3+length4+length5+length6);
 
         dialogBox.receipt({
            rect: {
@@ -588,20 +559,7 @@
             			selectSql(db, ssql, function(data){
             				if(data.length==0){
             					toast('该条码在本地不存在!')
-//          					var bardata = {
-//          						_id:new Date().getTime(),
-//          						barId:barId,
-//          						status:-1,
-//          						barScanDate:new Date(),
-//          						groupId:group._id
-//          					}
-//          					var isql = 'insert into Barcodetest(_id, barId, status, barScanDate, groupId) values (\''+_id
-//          						+'\',\''+barId+'\',\''+status+'\',\''+barScanDate+'\',\''+groupId+'\')'
-//          					executeSql(db, isql, function(){
-//          						uploadBar(bardata)
-//          					},function(errMsg){
-//          						toast('数据插入失败!错误:'+errMsg)
-//          					})
+
             				}else{
             					if(data[0].status==0){
 	            					var sql = 'update Barcodetest set status = 1,barScanDate=\''+new Date().getTime()+'\' where barId = \''+barId+'\''
@@ -638,7 +596,8 @@
 			barId:bar.barId,
 			groupId:bar.groupId,
 			barScanDate:bar.barScanDate,
-      remark: bar.remark
+      remark: bar.remark,
+      employeeId: user._id
 		}
 		post(url.uploadbarcode, data, function(ret,err){
 			if(err){
@@ -666,22 +625,6 @@
 			}
 		})
 	}
-//	function testcontent(barid,scantime,scanstatus,uploadstatus,groupNumber){
-//			var db = api.require('db');
-//			db.executeSql({
-// 			 		name: 'barcodeTable',
-// 					sql: 'INSERT OR REPLACE INTO Barcodetest (_id,barId,barScanDate,projName,status,groupId) VALUES (' + _id + ',' + barId + ',' + barScanDate + ',' + projName + ',' + status+ ',' + groupId + ')'
-//					}, function(ret, err){
-//						if (ret.status) {
-//						   selectcontent();
-//							//console.log("testcontsucceed:"+JSON.stringify(ret));
-//						}else{
-//							//console.log("testcontfail:"+JSON.stringify(err));
-//							alert("条码存入失败！");
-//						}
-//					});
-//
-//	}
 
 	function updateBarCodeInfo(barid){
 		//var db = api.require('db');
@@ -735,43 +678,38 @@
     					var dom=$("#scannercontent");
     					$api.setStorage(updateBarInfo,ret.data);
     					var  localbar = $api.getStorage('updateBarInfo');
-    					//console.log("updateBarInfo:"+JSON.stringify(localbar));
+
     						for(var i = 0; i<ret.data.length; i++){
-    							//console.log("查询结果："+"记录"+i+JSON.stringify(ret.data[i]));
-//  							$("#scannercontent").append("<tr><td>"+Number(i+1)+"</td><td class='scanname tooltip' title='barInfo' onclick='barInfo()'>"+ret.data[i].barid+
-//  							"</td><td><a href='javascript:;' class='deletetr' onclick='deletetr()'>清除</a></td></tr>");
+
     							var scansta = ret.data[i].scanstatus;
     							var uploadsta = ret.data[i].uploadstatus;
     							var No = Number(i+1);
     							var barNo = ret.data[i].barid;
     							var clear = '清除';
     							var bar = [No,barNo,clear,scansta,uploadsta];
-    							//console.log("bar&bar&bar:"+bar);
+
     							 bars.push(bar);
     						}
-     						//console.log("bars-bars-bars:"+bars);
+
 						for(var i=0;i<bars.length;i++){
-// 		 					btr+="<tr><td>"+bars[i][0]+"</td>"
-// 		 					+"<td class='scanname tooltip' title='barInfo' onclick='barInfo()'>"+bars[i][1]+"</td>"
-// 		 					+"<td><a href='javascript:;' class='deletetr' onclick='deletetr()'>"+bars[i][2]+"</a></td></tr>"
-  						    //console.log("html:"+bars[i]);
+
 							if(bars[i][3] == 'scanned'&& bars[i][4]=='upload'){
 								html1 += "<tr><td>"+Number(i+1)+"</td>"
  		 								+"<td class='scanname tooltip html1-color' title='barInfo' onclick='barInfo()'>"+bars[i][1]+"</td>"
  		 								+"<td><a href='javascript:;' class='deletetr' onclick='deletetr()'>"+bars[i][2]+"</a></td></tr>"
- 		 							//	console.log("html1:"+bars[i]);
+
 							}else{
 								if(bars[i][3] == 'scanned'&& bars[i][4]=='noUpload'){
 									html2 +="<tr><td>"+ Number(i+1)+"</td>"
  		 								  +"<td class='scanname tooltip html2-color' title='barInfo' onclick='barInfo()'>"+bars[i][1]+"</td>"
 			 		 					  +"<td><a href='javascript:;' class='deletetr' onclick='deletetr()'>"+bars[i][2]+"</a></td></tr>"
- 										// console.log("html2:"+bars[i]);
+
 								}else{
 									if(bars[i][3] == 'noScan'&& bars[i][4]=='noUpload'){
 										html3 +="<tr><td>"+ Number(i+1)+"</td>"
  		 								  		+"<td class='scanname tooltip html3-color' title='barInfo' onclick='barInfo()'>"+bars[i][1]+"</td>"
 			 		 					  		+"<td><a href='javascript:;' class='deletetr' onclick='deletetr()'>"+bars[i][2]+"</a></td></tr>"
- 											//	console.log("html3:"+bars[i]);
+
 									}
 								}
 							}
@@ -782,102 +720,6 @@
    						 		}
 			  });
 	}
-
-
-
-//	function groupcontent(workname,tel,workid){
-//			var employeedb = api.require('db');
-//			employeedb.executeSql({
-//				name: 'groupTable',
-//     			sql: 'INSERT OR REPLACE INTO Workgroup (workname,tel,workid) VALUES (' + workname + ',' + tel + ',' + workid + ')'
-//  		}, function(ret, err){
-//				if (ret.status) {
-//					console.log("存入小组人员："+JSON.stringify(ret));
-////      			var submitGroup='create';
-////	      			$api.setStorage('groupStatus',submitGroup);
-////	  				$("#deleteBtn").show();
-////	  				$("#createBtn").hide();
-//	  				selectemployee()
-//      		}else{
-//  				console.log("组员存入执行失败"+JSON.stringify(err));
-//  				alert("组员存入执行失败！");
-//  			}
-//  		});
-//	}
-
-//  	function selectemployee(){
-//  		var employeedb = api.require('db');
-//   		employeedb.selectSql({
-//    			name: 'groupTable',
-//      		sql: 'SELECT * FROM Workgroup'
-//  		}, function(ret, err){
-//      			if (ret.status) {
-//      				var str = "";
-//      				//var groupdata = JSON.stringify(ret.data);
-//      				//console.log("groupdata:"+JSON.stringify(ret.data));
-//      				var groupN=[];
-//      				var groups=[];
-//      				var dom = $("#employeecontent");
-//      				for(var i = 0; i<ret.data.length; i++){
-//	    					// console.log("查询结果："+JSON.stringify(ret.data[i]));
-//      				    //$("#employeecontent").append("<tr><td>"+ret.data[i].workname+"</td><td>"+ret.data[i].workid+"</td><td>"+ret.data[i].tel+"</td></tr>");
-//
-//							var name = ret.data[i].workname;
-//							var id = ret.data[i].workid;
-//							var tel = ret.data[i].tel;
-//							var groupdata = [id,name,tel];
-//							groups.push(groupdata);
-//							//console.log("groupdata"+groupdata);
-//       					if(i == ret.data.length-1){
-//      						groupN=groupN+ret.data[i].workid;
-//      					}else{
-//      						groupN=groupN+ret.data[i].workid+'&';
-//      					}
-//      			  		groupNumber=JSON.stringify(groupN);
-//      			  		//console.log('selectgroup:'+groupNumber);
-//      			  		var submitGroup='create';
-//	    				  	$api.setStorage('groupStatus',submitGroup);
-//	     				 	$("#deleteBtn").show();
-//	  						$("#createBtn").hide();
-//      				}
-//      				for(var i=0;i<groups.length;i++){
-//  						str+="<tr>"
-// 							for(var j=0;j<groups[i].length;j++){
-//     							str+="<td>"
-//     							str+=groups[i][j]+"</td>"
-// 							}
-//  						str+="</tr>"
-//						}
-//      				dom.html(str);
-//      				if(ret.data==""){
-//      					employeeInfo();
-//      				}
-//      				employeeInfo = $api.getStorage('userInfo');
-//      				 $("#employeeStation").html(employeeInfo.station);
-//
-//     				 } else {
-//          				alert("查询失败："+JSON.stringify(err));
-//
-//     						}
-// 				});
-//  	}
-
-
-// 	  function submit(){
-// 	  		var workermember = $api.getStorage('groupInfo');
-// 	  		var employeeNumbers = workermember.groupmember;
-// 	  		alert('employeeNumbers'+employeeNumbers);
-// 	  		console.log('employeeNumbers'+employeeNumbers);
-// 	  		for(var i = 0; i<employeeNumbers.length; i++){
-// 	  		if( employeeNumbers[i] != '' ){
-//	  		$("#employeecontent").append("<tr><td> </td><td>"+employeeNumbers[i]+"</td><td> </td></tr>");
-// 	  		var now = new Date().Format("yyyy-MM-dd hh:mm:ss");
-// 	      	createdate = JSON.stringify(now.toLocaleString());
-//	      	var groupdate = createdate;
-//          employeecontent(createdate,employeeNumbers[i]);
-//		    }
-//		   }
-//	}
 
     function selectProjname(){
       get(url.downloadgroup + '/' + user._id, function(ret, err){
@@ -1154,7 +996,7 @@
     					title:'警告',
     					msg:'当前小组还包含未上传成功的已经扫码成功的条码，小组撤销后，数据将会被删除，是否确定撤销小组？'
                     },function(ret,err){
-                    	if(ret.buttonIndex == 1){
+                    	if(ret.buttonIndex == 2){
     						doDeleteGroup()
                     	}
                     });
@@ -1228,96 +1070,14 @@
       }
     })
   }
-//		var root = $api.getStorage('groupInfo');
-//		console.log("grinfo"+JSON.stringify(root));
-//		if(root == "true"){
-//			var deleteGroup=confirm("是否撤销该组？")
-// 			if(deleteGroup==true){
-//  				var id = $api.getStorage('groupid');
-//  				var groupid = JSON.stringify(id.groupid);
-//  				console.log("removegroupid:"+groupid);
-// 				post(url.deletegroup+'/'+groupid,{},function(ret,err){
-// 				console.log('deletegroup');
-//					if(ret.retStatus =='OK'){
-//						//$api.setStorage('groupid',null);
-//						console.log('delete-success');
-//						alert(JSON.stringify(ret));
-//						alert("更新成功！");
-//						console.log("ret:"+JSON.stringify(ret));
-//						var employeedb = api.require('db');
-//  	    			employeedb.executeSql({
-//     			 			name:'groupTable',
-//     						sql: 'delete from Workgroup'
-//  	  		   		 }, function(ret, err){
-//      					if (ret.status) {
-//      						alert("本地撤销成功");
-// 	      						$("#deleteBtn").hide();
-// 	  							$("#createBtn").show();
-//
-// 		                         employeeInfo = $api.getStorage('userInfo');
-// 		                         $("#employeecontent").html("<tr><td>"+employeeInfo.workname+"</td><td>"+employeeInfo.workid+"</td><td>"+employeeInfo.tel+"</td></tr>");
-//								 $("#employeeStation").html(employeeInfo.station);
-// 	  							//employeeInfo();
-// 	  							var deleteGroup='remove';
-// 	     				 		$api.setStorage('groupStatus',deleteGroup);
-//      					}else {
-//          					alert("本地撤销失败："+JSON.stringify(err));
-//     				     	 }
-//        				});
-//					 }
-//				 });
-//        	}
-//		}else{
-//      	alert("对不起，你没有权限");
-//      }
-//	};
-
-// $("#deleteBtn2").click(function(){
-//		alert("撤销");
-//			var deleteGroup=confirm("是否撤销该组？")
-// 			if(deleteGroup==true){
-//						var employeedb = api.require('db');
-//  	    			employeedb.executeSql({
-//     			 			name:'groupTable',
-//     						sql: 'delete from Workgroup'
-//  	  		   		 }, function(ret, err){
-//      					if (ret.status) {
-//      						alert("本地撤销成功");
-// 	      						$("#deleteBtn").hide();
-// 	  							$("#createBtn").show();
-// 	  							var deleteGroup='remove';
-// 	     				 		$api.setStorage('groupStatus',deleteGroup);
-//
-//      					}else {
-//          					alert("本地撤销失败："+JSON.stringify(err));
-//     				     	 }
-//        				});
-//        	}
-//		});
-
-//	    flag=$api.getStorage('groupStatus');
-//	    console.log("keyopen:"+flag);
-//	 	 if(flag=='create'){
-// 	    	$("#createBtn").hide();
-// 	 		$("#deleteBtn").show();
-// 	 		$api.rmStorage('groupStatus');
-// 	 		console.log(1111);
-// 	 	}else{
-//	 	     	$("#createBtn").show();
-//	 			$("#deleteBtn").hide();
-//	 			$api.rmStorage('groupStatus');
-//	 	}
-//	}
 
 </script>
 </head>
 <body >
 <div class="total-height">
 	<div class="inline1">
-       <!--  <button onclick="javascript:window.location.href='sorttoday.html'">登&nbsp;&nbsp;&nbsp;录</button> -->
+
         <button class="smallbtn button-left ui-btn ui-btn-inline ui-mini" onclick="selectProjname()">更新</button>
-        <!-- <div class="centerout centerout-station" onclick="api.closeWin()" id="employeeStation"></div> -->
-       <!--  <h2 class="centerout"><div class="centerout-station" onclick="api.closeWin()" id="employeeStation"></div>岗位</h2> -->
         <output class="centerout"><h2 id="employeeStation">岗位</h2></output>
         <button class="smallbtn button-left ui-btn ui-btn-inline ui-mini" onclick="uploadData()">上传</button>
         <div class="button-left">
@@ -1385,11 +1145,7 @@
          							<i class="fa fa-trash-o"></i></button>
       							</th>
       						</tr>
-      						<!--<tr>
-               					<th>姓名</th>
-               					<th>员工号</th>
-               					<th>手机号</th>
-               				</tr>-->
+
       					</thead>
     				  </table>
       			</div>
